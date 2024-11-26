@@ -48,10 +48,11 @@ public class LobbyManager : MonoBehaviour
     {
         if (Instance != null)
         {
-            Destroy(Instance.gameObject);
+            Destroy(gameObject);
+            return;
         }
-
         Instance = this;
+        DontDestroyOnLoad(Instance);
     }
 
     private void Update()
