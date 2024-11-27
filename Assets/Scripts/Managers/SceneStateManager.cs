@@ -19,35 +19,40 @@ public class SceneStateManager : MonoBehaviour
         Instance = this;
     }
 
-    public void UnSubribeToPlayerEvent(PlayerController player)
+    private void OnEnable()
     {
-        player.onDied -= PlayerController_onDied;
-        player.onHit -= PlayerController_onHit;
+        SubribeToPlayerEvent();
     }
 
-    public void SubribeToPlayerEvent(PlayerController player)
+    private void OnDisable()
     {
-        UnSubribeToPlayerEvent(player);
+        UnSubribeToPlayerEvent();
+    }
 
-        players.Add(player);
+    public void UnSubribeToPlayerEvent()
+    {
+        PlayerController.onAppeared -= PlayerController_onAppeared;
+        PlayerController.onDied -= PlayerController_onDied;
+    }
 
-        player.onDied += PlayerController_onDied;
-        player.onHit += PlayerController_onHit;
+    public void SubribeToPlayerEvent()
+    {
+        PlayerController.onAppeared += PlayerController_onAppeared;
+        PlayerController.onDied += PlayerController_onDied;
+    }
+
+    private void PlayerController_onAppeared(object sender, EventArgs e)
+    {
+        players.Add((PlayerController) sender);
     }
 
     private void PlayerController_onDied(object sender, EventArgs e)
     {
-        Debug.Log("die");
         players.Remove((PlayerController) sender);
 
         if (players.Count == 0)
         {
             SceneLoadingManager.Instance.ReloadScene();
         }
-    }
-
-    private void PlayerController_onHit(object sender, EventArgs e)
-    {
-
     }
 }

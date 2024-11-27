@@ -13,7 +13,6 @@ public class PlayerMovement: MonoBehaviour
     [SerializeField] private bool rawInput = true;
     [SerializeField] private Transform feet;
     [SerializeField] private LayerMask groundMask;
-    [SerializeField] private FollowPlayer followPlayer;
 
     // Events
     public event EventHandler onJumped;
@@ -120,10 +119,10 @@ public class PlayerMovement: MonoBehaviour
         // Check if player want to look down
         if (m_isGrounded && m_inputY < 0)
         {
-            followPlayer.SetOffset(new Vector2(0, -lookDownDistance));
+            CameraManager.Instance.SetOffset(new Vector2(0, -lookDownDistance));
         } else
         {
-            followPlayer.SetOffset(Vector2.zero);
+            CameraManager.Instance.SetOffset(Vector2.zero);
         }
     }
 }

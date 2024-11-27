@@ -10,7 +10,8 @@ public class PlayerController : MonoBehaviour, IDamgable
     [SerializeField] private float invincibleFadedInterval = 0.2f;
     [SerializeField] private float invincibleFadedAmount = 0.4f;
 
-    public event EventHandler onDied;
+    static public event EventHandler onAppeared;
+    static public event EventHandler onDied;
     public event EventHandler onHit;
 
     private PlayerMovement m_playerMovement;
@@ -41,17 +42,20 @@ public class PlayerController : MonoBehaviour, IDamgable
     private void Start()
     {
         m_curHealth = maxHealth;
+
+        // TODO; remove this in multiplayer
+        CameraManager.Instance.target = transform;
     }
 
     private void OnEnable()
     {
-        SceneStateManager.Instance.SubribeToPlayerEvent(this);
         SubcribePlayerMovementEvent();
+
+        onAppeared?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnDisable()
     {
-        SceneStateManager.Instance.UnSubribeToPlayerEvent(this);
         UnSubcribePlayerMovementEvent();
     }
 

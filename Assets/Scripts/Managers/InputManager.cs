@@ -23,7 +23,6 @@ public class InputManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(Instance);
     }
 
     private void Update()
