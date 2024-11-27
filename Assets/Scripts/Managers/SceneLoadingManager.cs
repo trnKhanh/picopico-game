@@ -23,6 +23,8 @@ public class SceneLoadingManager : MonoBehaviour
 
     [SerializeField] private Scene[] scenes;
 
+    public SceneType defaultScene = SceneType.Menu;
+
     private string m_curSceneName;
 
     private void Awake()
@@ -36,6 +38,8 @@ public class SceneLoadingManager : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(Instance);
+
+        LoadScene(defaultScene);
     }
 
     private void Start()
@@ -53,8 +57,6 @@ public class SceneLoadingManager : MonoBehaviour
 
     public void LoadScene(SceneType sceneType)
     {
-        Debug.Log("Load Scene");
-
         string sceneName = GetSceneName(sceneType);
 
         if (sceneName != null)

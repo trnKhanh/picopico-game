@@ -17669,7 +17669,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 986331615228510312, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.56578565
+      value: 0.5657856
       objectReference: {fileID: 0}
     - target: {fileID: 986331615228510312, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -17702,6 +17702,10 @@ PrefabInstance:
     - target: {fileID: 2799481490955545754, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: m_Name
       value: SceneLoadingManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: defaultScene
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
