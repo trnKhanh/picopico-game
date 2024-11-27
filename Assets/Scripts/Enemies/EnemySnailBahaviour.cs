@@ -11,7 +11,6 @@ public class EnemySnailBahaviour : MonoBehaviour
     [SerializeField] private float wanderingMinRange = 3.0f;
     [SerializeField] private float wanderingMaxRange = 4.0f;
     [SerializeField] private float wanderingInterval = 5.0f;
-    [SerializeField] private Transform anchor;
 
 
     private const float eps = 0.1f;
@@ -49,9 +48,6 @@ public class EnemySnailBahaviour : MonoBehaviour
         UpdateBehaviour();
         UpdateEnemyStates();
         UpdateAnimation();
-
-        //TODO: debug
-        anchor.transform.position = m_anchorPosition;
     }
 
     private void FixedUpdate()
@@ -97,6 +93,7 @@ public class EnemySnailBahaviour : MonoBehaviour
         if (m_wanderingCoroutine == null)
             m_wanderingCoroutine = StartCoroutine(Wandering());
     }
+
     private void StopWandering()
     {
         if (m_wanderingCoroutine != null)
@@ -143,7 +140,6 @@ public class EnemySnailBahaviour : MonoBehaviour
         {
             m_chaseTargets.Add(collision.gameObject.transform);
         }
-        Debug.Log($"OnTriggerEnter2D: Chasing {m_chaseTargets.Count} targets");
     }
 
 
@@ -153,19 +149,26 @@ public class EnemySnailBahaviour : MonoBehaviour
         {
             m_chaseTargets.Remove(collision.gameObject.transform);
         }
-        Debug.Log($"OnTriggerExit2D: Chasing {m_chaseTargets.Count} targets");
     }
 
 
     private void OnCollisionStay2D(Collision2D collision)
-    {
+    { 
+        float contactAngle = Vector2.Angle(collision.contacts[0].normal, Vector2.up);
+        float damageAngleRange = 100;
+        float minAngle = (180 - damageAngleRange) / 2;
+        float maxAngle = 90 + damageAngleRange / 2;
+        bool dealDamage = minAngle < contactAngle && contactAngle < maxAngle;
         GameObject other = collision.gameObject;
         IDamgable damgable;
-        if (other.TryGetComponent<IDamgable>(out damgable))
+        if (dealDamage)
         {
-            if (other.tag == "Player")
+            if (other.TryGetComponent<IDamgable>(out damgable))
             {
-                damgable.Hit(damage);
+                if (other.tag == "Player")
+                {
+                    damgable.Hit(damage);
+                }
             }
         }
     }

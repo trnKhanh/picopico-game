@@ -246,4 +246,3 @@ MonoBehaviour:
   wanderingMinRange: 3
   wanderingMaxRange: 4
   wanderingInterval: 5
-  anchor: {fileID: 0}

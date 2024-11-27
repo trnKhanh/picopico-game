@@ -11,6 +11,7 @@ public class PlayerAudioController : MonoBehaviour
         Hit,
         Jump,
         Land,
+        Die,
     }
 
     [Serializable]

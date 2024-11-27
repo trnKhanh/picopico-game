@@ -48,6 +48,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(Instance);
     }
 
     private void Start()

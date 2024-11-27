@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f2f4dc9969e84b889ad26fa4440caf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
+  maxHealth: 1
   invincibleTime: 2
   invincibleFadedInterval: 0.2
   invincibleFadedAmount: 0.4
@@ -324,10 +324,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerAudioClips:
-  - state: 1
-    audioClip: {fileID: 8300000, guid: 86c7e58b4290a4817a10eb216c92ec2f, type: 3}
   - state: 2
+    audioClip: {fileID: 8300000, guid: 86c7e58b4290a4817a10eb216c92ec2f, type: 3}
+  - state: 3
     audioClip: {fileID: 8300000, guid: 4ae6f4c75df954ecd89c22e62194418b, type: 3}
+  - state: 1
+    audioClip: {fileID: 8300000, guid: c30e649e1b91e4ed0b60a526b8fd9773, type: 3}
+  - state: 4
+    audioClip: {fileID: 8300000, guid: ee514308fc2b94b468a9c1aa582ddab7, type: 3}
 --- !u!1 &9140470907866219286
 GameObject:
   m_ObjectHideFlags: 0

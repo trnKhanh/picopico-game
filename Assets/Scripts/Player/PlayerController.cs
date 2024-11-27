@@ -5,10 +5,13 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour, IDamgable
 {
-    [SerializeField] private int maxHealth = 10;
+    [SerializeField] private int maxHealth = 1;
     [SerializeField] private float invincibleTime = 2.0f;
     [SerializeField] private float invincibleFadedInterval = 0.2f;
     [SerializeField] private float invincibleFadedAmount = 0.4f;
+
+    public event EventHandler onDied;
+    public event EventHandler onHit;
 
     private PlayerMovement m_playerMovement;
     private PlayerAudioController m_playerAudioController;
@@ -38,9 +41,18 @@ public class PlayerController : MonoBehaviour, IDamgable
     private void Start()
     {
         m_curHealth = maxHealth;
+    }
 
+    private void OnEnable()
+    {
+        SceneStateManager.Instance.SubribeToPlayerEvent(this);
         SubcribePlayerMovementEvent();
-        
+    }
+
+    private void OnDisable()
+    {
+        SceneStateManager.Instance.UnSubribeToPlayerEvent(this);
+        UnSubcribePlayerMovementEvent();
     }
 
     private void Update()
@@ -108,9 +120,9 @@ public class PlayerController : MonoBehaviour, IDamgable
             return;
 
         m_curHealth -= damage;
-        if (m_curHealth < 0)
+        if (m_curHealth <= 0)
         {
-            Die();
+            DieEffect();
             return;
         }
 
@@ -119,7 +131,10 @@ public class PlayerController : MonoBehaviour, IDamgable
 
     private IEnumerator HitEffect()
     {
+        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Hit);
         m_animator.SetTrigger(k_hit);
+        onHit?.Invoke(this, EventArgs.Empty);
+
         m_isInvincible = true;
 
         bool isFaded = false;
@@ -146,16 +161,18 @@ public class PlayerController : MonoBehaviour, IDamgable
         m_spriteRenderer.color = fadedColor;
     }
 
-    private void Die()
+    private void DieEffect()
     {
         m_died = true;
         m_playerMovement.enabled = false;
+        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Die);
 
         m_animator.SetTrigger(k_disappear);
     }
 
-    public void Hide()
+    public void Die()
     {
+        onDied?.Invoke(this, EventArgs.Empty);
         gameObject.SetActive(false);
     }
 }
