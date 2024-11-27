@@ -7,6 +7,7 @@ public class PlayerAudioController : MonoBehaviour
 {
     public enum PlayerAudioState
     {
+        Run,
         Hit,
         Jump,
         Land,

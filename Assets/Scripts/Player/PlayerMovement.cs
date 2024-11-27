@@ -16,10 +16,11 @@ public class PlayerMovement: MonoBehaviour
     [SerializeField] private FollowPlayer followPlayer;
 
     // Events
-    public event EventHandler onHit;
     public event EventHandler onJumped;
     public event EventHandler onLanded;
+    public event EventHandler onStopped;
     public event EventHandler onMoved;
+    public event EventHandler onChangedDirection;
 
     private Rigidbody2D m_rigidbody;
     private Animator m_animator;
@@ -28,13 +29,7 @@ public class PlayerMovement: MonoBehaviour
 
     // Player's states
     private bool m_isFacingRight = true;
-    private bool m_isRunning = false;
     private bool m_isGrounded = false;
-
-    // Key
-    static private string k_running = "Running";
-    static private string k_hit = "Hit";
-    static private string k_velocityY = "VelocityY";
 
     private float m_inputX;
     private float m_inputY;
@@ -50,7 +45,6 @@ public class PlayerMovement: MonoBehaviour
     {
         UpdateInput();
         UpdatePlayerStates();
-        UpdateAntimation();
     }
 
     private void FixedUpdate()
@@ -69,18 +63,19 @@ public class PlayerMovement: MonoBehaviour
             m_inputX = InputManager.Instance.horizontalInput;
             m_inputY = InputManager.Instance.verticalInput;
         }
-
-        m_jump = m_inputY > 0 || Input.GetKeyDown(KeyCode.Space);
+        if (m_isGrounded && !m_jump)
+        {
+            m_jump = Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W);
+        }
     }
 
     private void UpdatePlayerStates()
     {
-        if (Mathf.Abs(m_inputX) > eps)
+        if ((m_isFacingRight && m_inputX < -eps) || (!m_isFacingRight && m_inputX > eps))
         {
-            m_isFacingRight = m_inputX > 0f;
+            m_isFacingRight = !m_isFacingRight;
+            onChangedDirection?.Invoke(this, EventArgs.Empty);
         }
-
-        m_isRunning = Mathf.Abs(m_inputX) > eps;
     }
 
     private void UpdatePlayerStatesPhysics()
@@ -95,26 +90,22 @@ public class PlayerMovement: MonoBehaviour
         }
     }
 
-    private void UpdateAntimation()
-    {
-        m_animator.SetBool(k_running, m_isRunning);
-        m_animator.SetFloat(k_velocityY, m_rigidbody.velocity.y);
-    }
-
     private void Move()
     {
-        Vector3 localScale = transform.localScale;
-        localScale.x = (m_isFacingRight ? 1 : -1) * Mathf.Abs(localScale.x);
-        transform.localScale = localScale;
-
         if (m_isGrounded || airControll)
         {
             // Move player using velocity
             Vector2 velocity = m_rigidbody.velocity;
             velocity.x = m_inputX * runSpeed;
             m_rigidbody.velocity = velocity;
-
+        }
+        
+        if (m_rigidbody.velocity.magnitude > eps)
+        {
             onMoved?.Invoke(this, EventArgs.Empty);
+        } else
+        {
+            onStopped?.Invoke(this, EventArgs.Empty);
         }
 
         if (m_jump && m_isGrounded)
@@ -122,6 +113,8 @@ public class PlayerMovement: MonoBehaviour
             // Jump
             m_rigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             onJumped?.Invoke(this, EventArgs.Empty);
+
+            m_jump = false;
         }
 
         // Check if player want to look down

@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 4398668166547142065}
   m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -101,7 +101,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: -968884257, guid: c2d023c062f104be9aac03cd60bf2103, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -283,6 +283,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f2f4dc9969e84b889ad26fa4440caf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 10
+  invincibleTime: 2
+  invincibleFadedInterval: 0.2
+  invincibleFadedAmount: 0.4
 --- !u!114 &7579706046935307094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,7 +309,7 @@ MonoBehaviour:
   feet: {fileID: 3046393642506268637}
   groundMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 192
   followPlayer: {fileID: 0}
 --- !u!114 &4398668166547142065
 MonoBehaviour:
@@ -319,6 +323,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c03294f5de3c416999036fff6fd4eca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAudioClips:
+  - state: 1
+    audioClip: {fileID: 8300000, guid: 86c7e58b4290a4817a10eb216c92ec2f, type: 3}
+  - state: 2
+    audioClip: {fileID: 8300000, guid: 4ae6f4c75df954ecd89c22e62194418b, type: 3}
 --- !u!1 &9140470907866219286
 GameObject:
   m_ObjectHideFlags: 0
