@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerAudioController : MonoBehaviour
+public class PlayerAudioController : NetworkBehaviour
 {
     public enum PlayerAudioState
     {
@@ -31,8 +32,29 @@ public class PlayerAudioController : MonoBehaviour
 
     public void Play(PlayerAudioState state)
     {
+        if (!IsOwner)
+            return;
+
+        PlayServerRpc(state);
+    }
+
+    private void PlayImpl(PlayerAudioState state)
+    {
         AudioClip audioClip = GetAudioClip(state);
-        m_audioSource.PlayOneShot(audioClip);
+        if (audioClip != null)
+            m_audioSource.PlayOneShot(audioClip);
+    }
+
+    [ServerRpc]
+    public void PlayServerRpc(PlayerAudioState state)
+    {
+        PlayClientRpc(state);
+    }
+
+    [ClientRpc]
+    public void PlayClientRpc(PlayerAudioState state)
+    {
+        PlayImpl(state);
     }
 
     private AudioClip GetAudioClip(PlayerAudioState state)

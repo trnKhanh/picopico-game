@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour, IDamgable
+public class PlayerController : NetworkBehaviour, IDamgable
 {
     [SerializeField] private int maxHealth = 1;
     [SerializeField] private float invincibleTime = 2.0f;
@@ -20,9 +21,11 @@ public class PlayerController : MonoBehaviour, IDamgable
     private Rigidbody2D m_rigidbody;
     private SpriteRenderer m_spriteRenderer;
 
-    private int m_curHealth;
-    private bool m_died = false;
-    private bool m_isInvincible = false;
+    private NetworkVariable<Vector3> nv_position = new NetworkVariable<Vector3>();
+    private NetworkVariable<Vector3> nv_localScale = new NetworkVariable<Vector3>();
+    private NetworkVariable<int> nv_curHealth = new NetworkVariable<int>();
+    private NetworkVariable<bool> nv_isInvincible = new NetworkVariable<bool>(false);
+    private NetworkVariable<bool> nv_died = new NetworkVariable<bool>(false);
 
     // Key
     static private string k_running = "Running";
@@ -39,35 +42,92 @@ public class PlayerController : MonoBehaviour, IDamgable
         m_spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        m_curHealth = maxHealth;
+        if (IsOwner)
+        {
+            SubcribePlayerMovementEvent();
+            CameraManager.Instance.target = transform;
+        }
 
-        // TODO; remove this in multiplayer
-        CameraManager.Instance.target = transform;
+        if (IsServer)
+        {
+            onAppeared?.Invoke(this, EventArgs.Empty);
+            nv_curHealth.Value = maxHealth;
+        }       
     }
 
-    private void OnEnable()
+    public override void OnNetworkDespawn()
     {
-        SubcribePlayerMovementEvent();
-
-        onAppeared?.Invoke(this, EventArgs.Empty);
+        if (IsOwner)
+        {
+            UnSubcribePlayerMovementEvent();
+        }
     }
 
-    private void OnDisable()
-    {
-        UnSubcribePlayerMovementEvent();
-    }
+
+    //private void OnEnable()
+    //{
+    //    if (IsOwner)
+    //    {
+    //        SubcribePlayerMovementEvent();
+    //    }
+
+    //    if (IsServer)
+    //    {
+    //        onAppeared?.Invoke(this, EventArgs.Empty);
+    //    }
+    //}
+
+    //private void OnDisable()
+    //{
+    //    if (IsOwner)
+    //    {
+    //        UnSubcribePlayerMovementEvent();
+    //    }
+    //}
 
     private void Update()
     {
+        if (IsOwner)
+        {
+            UpdateNetworkPosition();
+            UpdateAnimation();
+        } else
+        {
+            transform.position = nv_position.Value;
+            transform.localScale = nv_localScale.Value;
+        }
 
-        UpdateAnimation();
+    }
+
+    private void UpdateNetworkPosition()
+    {
+        UpdateNetworkPositionServerRpc(transform.position, transform.localScale);
+    }
+
+    [ServerRpc]
+    private void UpdateNetworkPositionServerRpc(Vector3 newPosition, Vector3 newLocalScale)
+    {
+        nv_position.Value = newPosition;
+        nv_localScale.Value = newLocalScale;
     }
 
     private void UpdateAnimation()
     {
-        m_animator.SetFloat(k_velocityY, m_rigidbody.velocity.y);
+        UpdateVelocityYServerRpc(m_rigidbody.velocity.y);
+    }
+
+    [ServerRpc]
+    private void UpdateVelocityYServerRpc(float newVelocityY)
+    {
+        UpdateVelocityYClientRpc(newVelocityY);
+    }
+    [ClientRpc]
+    private void UpdateVelocityYClientRpc(float newVelocityY)
+    {
+
+        m_animator.SetFloat(k_velocityY, newVelocityY);
     }
 
     private void UnSubcribePlayerMovementEvent()
@@ -92,13 +152,26 @@ public class PlayerController : MonoBehaviour, IDamgable
 
     private void PlayerMovement_onMoved(object sender, EventArgs e)
     {
-        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Run);
         m_animator.SetBool(k_running, true);
+        UpdateIsRunningYServerRpc(true);
     }
 
     private void PlayerMovement_onStopped(object sender, EventArgs e)
     {
         m_animator.SetBool(k_running, false);
+        UpdateIsRunningYServerRpc(false);
+    }
+
+    [ServerRpc]
+    private void UpdateIsRunningYServerRpc(bool isRunning)
+    {
+        UpdateIsRunningYClientRpc(isRunning);
+    }
+
+    [ClientRpc]
+    private void UpdateIsRunningYClientRpc(bool isRunning)
+    {
+        m_animator.SetBool(k_running, isRunning);
     }
 
     private void PlayerMovement_onChangedDirection(object sender, EventArgs e)
@@ -120,26 +193,41 @@ public class PlayerController : MonoBehaviour, IDamgable
 
     public void Hit(int damage)
     {
-        if (m_died || m_isInvincible)
+        // Only the server is in charge of these logic.
+        if (!IsServer)
             return;
 
-        m_curHealth -= damage;
-        if (m_curHealth <= 0)
+        if (nv_died.Value || nv_isInvincible.Value)
+            return;
+
+        nv_curHealth.Value -= damage;
+        if (nv_curHealth.Value <= 0)
         {
-            DieEffect();
+            Die();
             return;
         }
+        StartCoroutine(InvincibleCountDown());
+        TriggerHitEffectClientRpc();
+    }
 
-        StartCoroutine(HitEffect());
+
+    private IEnumerator InvincibleCountDown()
+    {
+        nv_isInvincible.Value = true;
+        yield return new WaitForSeconds(invincibleTime);
+        nv_isInvincible.Value = false;
     }
 
     private IEnumerator HitEffect()
     {
         m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Hit);
         m_animator.SetTrigger(k_hit);
-        onHit?.Invoke(this, EventArgs.Empty);
 
-        m_isInvincible = true;
+        // Only owner fires events
+        if (IsOwner)
+        {
+            onHit?.Invoke(this, EventArgs.Empty);
+        }
 
         bool isFaded = false;
         float timeLeft = invincibleTime;
@@ -155,7 +243,11 @@ public class PlayerController : MonoBehaviour, IDamgable
         }
 
         SetSpriteOpacity(1);
-        m_isInvincible = false;
+    }
+    [ClientRpc]
+    private void TriggerHitEffectClientRpc()
+    {
+        StartCoroutine(HitEffect());
     }
 
     private void SetSpriteOpacity(float alpha)
@@ -165,18 +257,44 @@ public class PlayerController : MonoBehaviour, IDamgable
         m_spriteRenderer.color = fadedColor;
     }
 
+    public void Die()
+    {
+        nv_died.Value = true;
+        TriggerDieEffectClientRpc();
+    }
+
+    [ClientRpc]
+    private void TriggerDieEffectClientRpc()
+    {
+        DieEffect();
+    }
+
     private void DieEffect()
     {
-        m_died = true;
+        // Only owner fires events
+        if (IsOwner)
+        {
+            onDied?.Invoke(this, EventArgs.Empty);
+        }
+
         m_playerMovement.enabled = false;
         m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Die);
-
         m_animator.SetTrigger(k_disappear);
     }
 
-    public void Die()
+    public void Disappear()
     {
-        onDied?.Invoke(this, EventArgs.Empty);
-        gameObject.SetActive(false);
+        Debug.Log("Disappear");
+        if (IsOwner)
+        {
+            Debug.Log("Dissapear");
+            DisappearServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void DisappearServerRpc()
+    {
+        NetworkObject.Despawn(true);
     }
 }

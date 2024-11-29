@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using Unity.Netcode;
 
-public class PlayerMovement: MonoBehaviour
+public class PlayerMovement: NetworkBehaviour
 {
     [SerializeField] private float runSpeed = 100.0f;
     [SerializeField] private float jumpForce = 7.0f;
     [SerializeField] private float feetRadius = 0.01f;
     [SerializeField] private float lookDownDistance = 4.0f;
-    [SerializeField] private float normalDistance = 0.01f;
     [SerializeField] private bool airControll = true;
     [SerializeField] private bool rawInput = true;
+    [SerializeField] private float feetSize = 1f;
     [SerializeField] private Transform feet;
     [SerializeField] private LayerMask groundMask;
 
@@ -29,6 +30,7 @@ public class PlayerMovement: MonoBehaviour
     // Player's states
     private bool m_isFacingRight = true;
     private bool m_isGrounded = false;
+    private bool m_isRunning = false;
 
     private float m_inputX;
     private float m_inputY;
@@ -42,12 +44,18 @@ public class PlayerMovement: MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner)
+            return;
+
         UpdateInput();
         UpdatePlayerStates();
     }
 
     private void FixedUpdate()
     {
+        if (!IsOwner)
+            return;
+
         UpdatePlayerStatesPhysics();
         Move();
     }
@@ -80,7 +88,10 @@ public class PlayerMovement: MonoBehaviour
     private void UpdatePlayerStatesPhysics()
     {
         bool tmpGrounded = m_isGrounded;
-        m_isGrounded = Physics2D.Raycast(feet.position, Vector2.down, feetRadius, groundMask);
+
+        m_isGrounded = false;
+        m_isGrounded |= Physics2D.Raycast(feet.position - new Vector3(feetSize / 2, 0, 0), Vector2.down, feetRadius, groundMask);
+        m_isGrounded |= Physics2D.Raycast(feet.position + new Vector3(feetSize / 2, 0, 0), Vector2.down, feetRadius, groundMask);
 
         // Check if player has just landed
         if (m_isGrounded && !tmpGrounded)
@@ -101,10 +112,14 @@ public class PlayerMovement: MonoBehaviour
         
         if (m_rigidbody.velocity.magnitude > eps)
         {
-            onMoved?.Invoke(this, EventArgs.Empty);
+            if (!m_isRunning)
+                onMoved?.Invoke(this, EventArgs.Empty);
+            m_isRunning = true;
         } else
         {
-            onStopped?.Invoke(this, EventArgs.Empty);
+            if (m_isRunning)
+                onStopped?.Invoke(this, EventArgs.Empty);
+            m_isRunning = false;
         }
 
         if (m_jump && m_isGrounded)

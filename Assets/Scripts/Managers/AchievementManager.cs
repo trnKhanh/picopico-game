@@ -3,20 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SceneStateManager : MonoBehaviour
+public class AchievementManager : MonoBehaviour
 {
-    public static SceneStateManager Instance { get; private set; }
-
-    private List<PlayerController> players = new List<PlayerController>();
+    static public AchievementManager Instance { get; private set; }
 
     private void Awake()
     {
         if (Instance != null)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
+
         Instance = this;
+        DontDestroyOnLoad(this);
     }
 
     private void OnEnable()
@@ -45,16 +45,37 @@ public class SceneStateManager : MonoBehaviour
 
     private void PlayerController_onAppeared(object sender, EventArgs e)
     {
-        players.Add((PlayerController) sender);
+
     }
 
     private void PlayerController_onDied(object sender, EventArgs e)
     {
-        players.Remove((PlayerController) sender);
 
-        //if (players.Count == 0)
-        //{
-        //    SceneLoadingManager.Instance.ReloadScene();
-        //}
+    }
+}
+
+
+abstract class BaseAchievement
+{
+    public abstract bool GetIcon();
+    public abstract string GetText();
+    public abstract bool UpdateState(AchievementManager achievementManager);
+}
+
+class JumpAchievement : BaseAchievement
+{
+    public override bool GetIcon()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override string GetText()
+    {
+        return "Step in new the new world";
+    }
+
+    public override bool UpdateState(AchievementManager achievementManager)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using IngameDebugConsole;
+using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
@@ -10,13 +11,13 @@ public class CommandManager : MonoBehaviour
 {
     private void Start()
     {
-        LobbyManager.Instance.Authenticate($"{UnityEngine.Random.Range(1, 100)}");
+        //LobbyManager.Instance.Authenticate($"{UnityEngine.Random.Range(1, 100)}");
 
-        LobbyManager.Instance.OnCreatedLobby += CommandManager_OnCreatedLobby;
-        LobbyManager.Instance.OnLobbiesListChange += CommandManager_OnLobbiesListChange;
-        LobbyManager.Instance.OnJoinedLobby += CommandManager_OnJoinedLobby;
-        LobbyManager.Instance.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
-        LobbyManager.Instance.OnLeftLobby += CommandManager_OnLeftLobby;
+        //LobbyManager.Instance.OnCreatedLobby += CommandManager_OnCreatedLobby;
+        //LobbyManager.Instance.OnLobbiesListChange += CommandManager_OnLobbiesListChange;
+        //LobbyManager.Instance.OnJoinedLobby += CommandManager_OnJoinedLobby;
+        //LobbyManager.Instance.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
+        //LobbyManager.Instance.OnLeftLobby += CommandManager_OnLeftLobby;
     }
 
     private void CommandManager_OnLeftLobby(object sender, EventArgs e)
@@ -95,5 +96,23 @@ public class CommandManager : MonoBehaviour
     public static void LeaveLobby()
     {
         LobbyManager.Instance.LeaveLobby();
+    }
+
+    [ConsoleMethod("start-host", "Start host")]
+    public static void StartHost()
+    {
+        NetworkManager.Singleton.StartHost();
+    }
+
+    [ConsoleMethod("start-server", "Start server")]
+    public static void StartServer()
+    {
+        NetworkManager.Singleton.StartServer();
+    }
+
+    [ConsoleMethod("start-client", "Start client")]
+    public static void StartClient()
+    {
+        NetworkManager.Singleton.StartClient();
     }
 }
