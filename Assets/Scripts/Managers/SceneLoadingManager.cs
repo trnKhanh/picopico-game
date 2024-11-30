@@ -25,7 +25,8 @@ public class SceneLoadingManager : NetworkBehaviour
 
     [SerializeField] private Scene[] scenes;
 
-    public SceneType defaultScene = SceneType.Menu;
+    public SceneType localDefaultType = SceneType.Menu;
+    public SceneType multiplayerDefaultScene = SceneType.Menu;
 
     private string m_curSceneName;
 
@@ -44,7 +45,28 @@ public class SceneLoadingManager : NetworkBehaviour
 
     private void Start()
     {
-        LoadScene(defaultScene, false);
+        LoadScene(localDefaultType, false);
+    }
+
+    private void OnEnable()
+    {
+        //LobbyManager.Instance.OnKickedFromLobby += LobbyManager_OnKickedFromLobby;
+        //LobbyManager.Instance.OnLeftLobby += LobbyManager_OnKickedFromLobby;
+    }
+
+    private void OnDisable()
+    {
+        
+    }
+
+    private void UnSubribeToLobbyManagerEvents()
+    {
+
+    }
+
+    private void SubribeToLobbyManagerEvents()
+    {
+
     }
 
     public override void OnNetworkSpawn()
@@ -55,8 +77,8 @@ public class SceneLoadingManager : NetworkBehaviour
             networkSceneManager.OnLoadComplete -= NetworkSceneManager_OnLoadComplete;
             networkSceneManager.OnLoadComplete += NetworkSceneManager_OnLoadComplete;
 
-            LoadScene(defaultScene, true);
-        }
+            LoadScene(multiplayerDefaultScene, true);
+        } 
     }
     public override void OnNetworkDespawn()
     {

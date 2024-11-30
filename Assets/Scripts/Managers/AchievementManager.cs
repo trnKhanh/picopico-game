@@ -1,11 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class AchievementManager : MonoBehaviour
 {
     static public AchievementManager Instance { get; private set; }
+
+    [SerializeField] private TMP_Text popUpText;
+
+    [SerializeField] private BaseAchievement[] m_baseAchievements;
+    private Animator m_animator;
+
+    static private string k_popup = "Popup";
 
     private void Awake()
     {
@@ -19,63 +27,47 @@ public class AchievementManager : MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
+    private void Start()
+    {
+        m_animator = GetComponentInChildren<Animator>();
+    }
+
     private void OnEnable()
     {
-        SubribeToPlayerEvent();
+        SubribeToBaseAchievements();
     }
 
     private void OnDisable()
     {
-        UnSubribeToPlayerEvent();
+        UnSubribeToBaseAchievements();
     }
 
-    public void UnSubribeToPlayerEvent()
+    private void SubribeToBaseAchievements()
     {
-        PlayerController.onAppeared -= PlayerController_onAppeared;
-        PlayerController.onDissapeared -= PlayerController_onDied;
+        UnSubribeToBaseAchievements();
+        foreach (BaseAchievement baseAchievement in m_baseAchievements)
+        {
+            baseAchievement.onAchieved += BaseAchievement_onAchieved;
+        }
     }
 
-    public void SubribeToPlayerEvent()
+    private void UnSubribeToBaseAchievements()
     {
-        UnSubribeToPlayerEvent();
-
-        PlayerController.onAppeared += PlayerController_onAppeared;
-        PlayerController.onDissapeared += PlayerController_onDied;
+        foreach (BaseAchievement baseAchievement in m_baseAchievements)
+        {
+            baseAchievement.onAchieved -= BaseAchievement_onAchieved;
+        }
     }
 
-    private void PlayerController_onAppeared(object sender, EventArgs e)
+    private void BaseAchievement_onAchieved(object sender, EventArgs e)
     {
-
+        BaseAchievement achievement = (BaseAchievement)sender;
+        ShowAchievementPopup(achievement);
     }
 
-    private void PlayerController_onDied(object sender, EventArgs e)
+    private void ShowAchievementPopup(BaseAchievement achievement)
     {
-
-    }
-}
-
-
-abstract class BaseAchievement
-{
-    public abstract bool GetIcon();
-    public abstract string GetText();
-    public abstract bool UpdateState(AchievementManager achievementManager);
-}
-
-class JumpAchievement : BaseAchievement
-{
-    public override bool GetIcon()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override string GetText()
-    {
-        return "Step in new the new world";
-    }
-
-    public override bool UpdateState(AchievementManager achievementManager)
-    {
-        throw new NotImplementedException();
+        popUpText.text = achievement.text;
+        m_animator.SetTrigger(k_popup);
     }
 }

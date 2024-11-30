@@ -15,8 +15,8 @@ public class PlayerController : NetworkBehaviour, IDamgable
     static public event EventHandler onDissapeared;
     public event EventHandler onHit;
 
-    private PlayerMovement m_playerMovement;
-    private PlayerAudioController m_playerAudioController;
+    public PlayerMovement playerMovement { get; private set; }
+    public PlayerAudioController playerAudioController { get; private set; }
     private Animator m_animator;
     private Rigidbody2D m_rigidbody;
     private SpriteRenderer m_spriteRenderer;
@@ -35,8 +35,8 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void Awake()
     {
-        m_playerMovement = GetComponent<PlayerMovement>();
-        m_playerAudioController = GetComponent<PlayerAudioController>();
+        playerMovement = GetComponent<PlayerMovement>();
+        playerAudioController = GetComponent<PlayerAudioController>();
         m_animator = GetComponent<Animator>();
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
@@ -62,6 +62,10 @@ public class PlayerController : NetworkBehaviour, IDamgable
         if (IsOwner)
         {
             UnSubcribePlayerMovementEvent();
+        }
+        if (IsServer)
+        {
+            onDissapeared?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -115,22 +119,22 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void UnSubcribePlayerMovementEvent()
     {
-        m_playerMovement.onMoved -= PlayerMovement_onMoved;
-        m_playerMovement.onStopped -= PlayerMovement_onStopped;
-        m_playerMovement.onChangedDirection -= PlayerMovement_onChangedDirection;
-        m_playerMovement.onJumped -= PlayerMovement_onJumped;
-        m_playerMovement.onLanded -= PlayerMovement_onLanded;
+        playerMovement.onMoved -= PlayerMovement_onMoved;
+        playerMovement.onStopped -= PlayerMovement_onStopped;
+        playerMovement.onChangedDirection -= PlayerMovement_onChangedDirection;
+        playerMovement.onJumped -= PlayerMovement_onJumped;
+        playerMovement.onLanded -= PlayerMovement_onLanded;
     }
 
     private void SubcribePlayerMovementEvent()
     {
         UnSubcribePlayerMovementEvent();
 
-        m_playerMovement.onMoved += PlayerMovement_onMoved;
-        m_playerMovement.onStopped += PlayerMovement_onStopped;
-        m_playerMovement.onChangedDirection += PlayerMovement_onChangedDirection;
-        m_playerMovement.onJumped += PlayerMovement_onJumped;
-        m_playerMovement.onLanded += PlayerMovement_onLanded;
+        playerMovement.onMoved += PlayerMovement_onMoved;
+        playerMovement.onStopped += PlayerMovement_onStopped;
+        playerMovement.onChangedDirection += PlayerMovement_onChangedDirection;
+        playerMovement.onJumped += PlayerMovement_onJumped;
+        playerMovement.onLanded += PlayerMovement_onLanded;
     }
 
     private void PlayerMovement_onMoved(object sender, EventArgs e)
@@ -166,12 +170,12 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void PlayerMovement_onJumped(object sender, EventArgs e)
     {
-        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Jump);
+        playerAudioController.Play(PlayerAudioController.PlayerAudioState.Jump);
     }
 
     private void PlayerMovement_onLanded(object sender, EventArgs e)
     {
-        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Land);
+        playerAudioController.Play(PlayerAudioController.PlayerAudioState.Land);
     }
 
     public void Hit(int damage)
@@ -203,7 +207,7 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private IEnumerator HitEffect()
     {
-        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Hit);
+        playerAudioController.Play(PlayerAudioController.PlayerAudioState.Hit);
         m_animator.SetTrigger(k_hit);
 
         // Only owner fires events
@@ -254,8 +258,8 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void DieEffect()
     {
-        m_playerMovement.enabled = false;
-        m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Die);
+        playerMovement.enabled = false;
+        playerAudioController.Play(PlayerAudioController.PlayerAudioState.Die);
         m_animator.SetTrigger(k_disappear);
     }
 
@@ -270,7 +274,6 @@ public class PlayerController : NetworkBehaviour, IDamgable
     [ServerRpc]
     private void DisappearServerRpc()
     {
-        onDissapeared?.Invoke(this, EventArgs.Empty);
         NetworkObject.Despawn(true);
     }
 }

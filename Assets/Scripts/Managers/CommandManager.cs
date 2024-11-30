@@ -9,6 +9,17 @@ using UnityEngine;
 
 public class CommandManager : MonoBehaviour
 {
+    static public CommandManager Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(this);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(this);
+    }
     private void Start()
     {
         LobbyManager.Instance.OnCreatedLobby += CommandManager_OnCreatedLobby;
@@ -16,11 +27,16 @@ public class CommandManager : MonoBehaviour
         LobbyManager.Instance.OnJoinedLobby += CommandManager_OnJoinedLobby;
         LobbyManager.Instance.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
         LobbyManager.Instance.OnLeftLobby += CommandManager_OnLeftLobby;
+        LobbyManager.Instance.OnKickedFromLobby += CommandManager_OnKickedFromLobby;
     }
 
     private void CommandManager_OnLeftLobby(object sender, EventArgs e)
     {
         Debug.Log("Left lobby");
+    }
+    private void CommandManager_OnKickedFromLobby(object sender, EventArgs e)
+    {
+        Debug.Log("Kicked");
     }
 
     private void CommandManager_OnUpdatedLobby(object sender, LobbyManager.LobbyEventArgs e)
@@ -59,48 +75,54 @@ public class CommandManager : MonoBehaviour
     public static void CreateLobby(string playerName)
     {
         LobbyManager.Instance.Authenticate(playerName);
-
     }
 
     [ConsoleMethod("create-lobby", "Create lobby")]
-    public static void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate = false)
+    public static async void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate = false)
     {
-        LobbyManager.Instance.CreateLobby(lobbyName, maxPlayers, isPrivate);
+        await LobbyManager.Instance.CreateLobby(lobbyName, maxPlayers, isPrivate);
     }
+
     [ConsoleMethod("list-lobbies", "List lobbies")]
-    public static void ListLobbies()
+    public static async void ListLobbies()
     {
-        LobbyManager.Instance.ListLobbies(0, 10);
+        await LobbyManager.Instance.ListLobbies(0, 10);
+    }
+
+    [ConsoleMethod("kick-player", "Kick player")]
+    public static async void KickPlayer(string playerId)
+    {
+        await LobbyManager.Instance.KickPlayer(playerId);
     }
 
     [ConsoleMethod("join-lobby-by-code", "Join lobby by code")]
-    public static void JoinLobbyByCode(string joinCode)
+    public static async void JoinLobbyByCode(string joinCode)
     {
-        LobbyManager.Instance.JoinLobbyByCode(joinCode);
+        await LobbyManager.Instance.JoinLobbyByCode(joinCode);
     }
 
     [ConsoleMethod("quick-join", "Join lobby by code")]
-    public static void QuickJoin()
+    public static async void QuickJoin()
     {
-        LobbyManager.Instance.QuickJoinLobby();
+        await LobbyManager.Instance.QuickJoinLobby();
     }
 
     [ConsoleMethod("change-lobby-name", "Change lobby name")]
-    public static void ChangeLobbyName(string name)
+    public static async void ChangeLobbyName(string name)
     {
-        LobbyManager.Instance.ChangeLobbyName(name);
+        await LobbyManager.Instance.ChangeLobbyName(name);
     }
 
     [ConsoleMethod("change-lobby-max-players", "Change lobby max players")]
-    public static void ChangeLobbyName(int maxPlayers)
+    public static async void ChangeLobbyName(int maxPlayers)
     {
-        LobbyManager.Instance.ChangeLobbyMaxPlayers(maxPlayers);
+        await LobbyManager.Instance.ChangeLobbyMaxPlayers(maxPlayers);
     }
 
     [ConsoleMethod("leave-lobby", "Leave lobby")]
-    public static void LeaveLobby()
+    public static async void LeaveLobby()
     {
-        LobbyManager.Instance.LeaveLobby();
+        await LobbyManager.Instance.LeaveLobby();
     }
 
     [ConsoleMethod("start-host", "Start host")]
@@ -122,8 +144,8 @@ public class CommandManager : MonoBehaviour
     }
 
     [ConsoleMethod("start-game", "Start game")]
-    public static void StartGame()
+    public static async void StartGame()
     {
-        LobbyManager.Instance.StartGame();
+        await LobbyManager.Instance.StartGame();
     }
 }
