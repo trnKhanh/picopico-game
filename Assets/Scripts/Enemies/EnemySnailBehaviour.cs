@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class EnemySnailBahaviour : MonoBehaviour
+public class EnemySnailBehaviour : EnemyBehaviour
 {
     [SerializeField] private int damage = 1;
     [SerializeField] private float wanderingSpeed = 5.0f;
@@ -12,29 +14,23 @@ public class EnemySnailBahaviour : MonoBehaviour
     [SerializeField] private float wanderingMaxRange = 4.0f;
     [SerializeField] private float wanderingInterval = 5.0f;
 
-
     private const float eps = 0.1f;
 
     // Enemies states
     private Vector2 m_anchorPosition;
     private Vector2 m_destination;
     private bool m_isMoving = false;
-    private bool m_isFacingRight = false;
+    private bool m_isFacingRight = true;
     private float m_moveSpeed = 0;
+    private float m_velocityX = 0;
     private List<Transform> m_chaseTargets = new List<Transform>();
 
-    // Key
-    static private string k_walking = "Walking";
-    static private string k_hit = "Hit";
-
     private Rigidbody2D m_rigidbody;
-    private Animator m_animator;
     private Coroutine m_wanderingCoroutine;
 
     private void Awake()
     {
         m_rigidbody = GetComponent<Rigidbody2D>();
-        m_animator = GetComponent<Animator>();
     }
 
     private void Start()
@@ -45,13 +41,23 @@ public class EnemySnailBahaviour : MonoBehaviour
 
     private void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         UpdateBehaviour();
+        UpdateMovementState();
         UpdateEnemyStates();
-        UpdateAnimation();
     }
 
     private void FixedUpdate()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         Move();
     }
 
@@ -69,23 +75,43 @@ public class EnemySnailBahaviour : MonoBehaviour
         }
     }
 
-    private void UpdateEnemyStates()
+    private void UpdateMovementState()
     {
-        m_isMoving = m_rigidbody.velocity.magnitude > eps;
-
-        if (Mathf.Abs(m_destination.x - transform.position.x) > eps)
+        if (Mathf.Abs(m_destination.x - transform.position.x) > destinationRadius)
         {
-            m_isFacingRight = m_destination.x - transform.position.x > eps;
+            if (m_destination.x - transform.position.x > eps)
+            {
+                m_velocityX = m_moveSpeed;
+            } else
+            {
+                m_velocityX = -m_moveSpeed;
+            }
+        } else
+        {
+            m_velocityX = 0;
         }
     }
 
-    private void UpdateAnimation()
+    private void UpdateEnemyStates()
     {
-        m_animator.SetBool(k_walking, m_isMoving);
+        if ((m_isFacingRight && m_velocityX < -eps) || (!m_isFacingRight && m_velocityX > eps))
+        {
+            m_isFacingRight = !m_isFacingRight;
+            
+            InvokeOnChangedDirection(EventArgs.Empty);
+        }
 
-        Vector3 localScale = transform.localScale;
-        localScale.x = (m_isFacingRight ? 1 : -1) * Mathf.Abs(localScale.x);
-        transform.localScale = localScale;
+        if (Mathf.Abs(m_velocityX) > eps)
+        {
+            if (!m_isMoving)
+                InvokeOnMoved(EventArgs.Empty);
+            m_isMoving = true;
+        } else
+        {
+            if (m_isMoving)
+                InvokeOnStopped(EventArgs.Empty);
+            m_isMoving = false;
+        }
     }
 
     private void StartWandering()
@@ -106,7 +132,7 @@ public class EnemySnailBahaviour : MonoBehaviour
         while (true)
         {
             float wanderingDelta = wanderingMaxRange - wanderingMinRange;
-            float randomDistance = Random.Range(0, wanderingDelta) + wanderingMinRange;
+            float randomDistance = UnityEngine.Random.Range(0, wanderingDelta) + wanderingMinRange;
             bool goToLeft = transform.position.x > m_anchorPosition.x;
             m_destination.x = m_anchorPosition.x + randomDistance * (goToLeft ? -1 : 1);
             yield return new WaitForSeconds(wanderingInterval);
@@ -116,21 +142,7 @@ public class EnemySnailBahaviour : MonoBehaviour
     private void Move()
     {
         Vector2 velocity = m_rigidbody.velocity;
-
-        if (Mathf.Abs(transform.position.x - m_destination.x) > destinationRadius)
-        {
-            if (transform.position.x - m_destination.x > destinationRadius)
-            {
-                velocity.x = -m_moveSpeed;
-            } else
-            {
-                velocity.x = m_moveSpeed;
-            }
-        } else
-        {
-            velocity.x = 0;
-        }
-
+        velocity.x = m_velocityX;
         m_rigidbody.velocity = velocity;
     }
 

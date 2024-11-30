@@ -11,13 +11,11 @@ public class CommandManager : MonoBehaviour
 {
     private void Start()
     {
-        //LobbyManager.Instance.Authenticate($"{UnityEngine.Random.Range(1, 100)}");
-
-        //LobbyManager.Instance.OnCreatedLobby += CommandManager_OnCreatedLobby;
-        //LobbyManager.Instance.OnLobbiesListChange += CommandManager_OnLobbiesListChange;
-        //LobbyManager.Instance.OnJoinedLobby += CommandManager_OnJoinedLobby;
-        //LobbyManager.Instance.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
-        //LobbyManager.Instance.OnLeftLobby += CommandManager_OnLeftLobby;
+        LobbyManager.Instance.OnCreatedLobby += CommandManager_OnCreatedLobby;
+        LobbyManager.Instance.OnLobbiesListChange += CommandManager_OnLobbiesListChange;
+        LobbyManager.Instance.OnJoinedLobby += CommandManager_OnJoinedLobby;
+        LobbyManager.Instance.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
+        LobbyManager.Instance.OnLeftLobby += CommandManager_OnLeftLobby;
     }
 
     private void CommandManager_OnLeftLobby(object sender, EventArgs e)
@@ -55,6 +53,13 @@ public class CommandManager : MonoBehaviour
     {
         Lobby lobby = e.lobby;
         Debug.Log($"Joined lobby: {lobby.Name}; {lobby.MaxPlayers}; {lobby.IsPrivate}");
+    }
+
+    [ConsoleMethod("authenticate", "authenticate")]
+    public static void CreateLobby(string playerName)
+    {
+        LobbyManager.Instance.Authenticate(playerName);
+
     }
 
     [ConsoleMethod("create-lobby", "Create lobby")]
@@ -114,5 +119,11 @@ public class CommandManager : MonoBehaviour
     public static void StartClient()
     {
         NetworkManager.Singleton.StartClient();
+    }
+
+    [ConsoleMethod("start-game", "Start game")]
+    public static void StartGame()
+    {
+        LobbyManager.Instance.StartGame();
     }
 }

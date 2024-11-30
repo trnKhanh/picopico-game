@@ -11,7 +11,6 @@ public class PlayerMovement: NetworkBehaviour
     [SerializeField] private float lookDownDistance = 4.0f;
     [SerializeField] private bool airControll = true;
     [SerializeField] private bool rawInput = true;
-    [SerializeField] private float feetSize = 1f;
     [SerializeField] private Transform feet;
     [SerializeField] private LayerMask groundMask;
 
@@ -24,6 +23,7 @@ public class PlayerMovement: NetworkBehaviour
 
     private Rigidbody2D m_rigidbody;
     private Animator m_animator;
+    private BoxCollider2D m_collider;
 
     private const float eps = 0.01f;
 
@@ -40,6 +40,7 @@ public class PlayerMovement: NetworkBehaviour
     {
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_animator = GetComponent<Animator>();
+        m_collider = GetComponent<BoxCollider2D>();
     }
 
     private void Update()
@@ -83,15 +84,26 @@ public class PlayerMovement: NetworkBehaviour
             m_isFacingRight = !m_isFacingRight;
             onChangedDirection?.Invoke(this, EventArgs.Empty);
         }
+
+        if (Mathf.Abs(m_inputX) > eps)
+        {
+            if (!m_isRunning)
+                onMoved?.Invoke(this, EventArgs.Empty);
+            m_isRunning = true;
+        }
+        else
+        {
+            if (m_isRunning)
+                onStopped?.Invoke(this, EventArgs.Empty);
+            m_isRunning = false;
+        }
     }
 
     private void UpdatePlayerStatesPhysics()
     {
         bool tmpGrounded = m_isGrounded;
 
-        m_isGrounded = false;
-        m_isGrounded |= Physics2D.Raycast(feet.position - new Vector3(feetSize / 2, 0, 0), Vector2.down, feetRadius, groundMask);
-        m_isGrounded |= Physics2D.Raycast(feet.position + new Vector3(feetSize / 2, 0, 0), Vector2.down, feetRadius, groundMask);
+        m_isGrounded = Physics2D.BoxCast(feet.position, m_collider.size, 0, Vector2.down, feetRadius, groundMask);
 
         // Check if player has just landed
         if (m_isGrounded && !tmpGrounded)
@@ -108,18 +120,6 @@ public class PlayerMovement: NetworkBehaviour
             Vector2 velocity = m_rigidbody.velocity;
             velocity.x = m_inputX * runSpeed;
             m_rigidbody.velocity = velocity;
-        }
-        
-        if (m_rigidbody.velocity.magnitude > eps)
-        {
-            if (!m_isRunning)
-                onMoved?.Invoke(this, EventArgs.Empty);
-            m_isRunning = true;
-        } else
-        {
-            if (m_isRunning)
-                onStopped?.Invoke(this, EventArgs.Empty);
-            m_isRunning = false;
         }
 
         if (m_jump && m_isGrounded)

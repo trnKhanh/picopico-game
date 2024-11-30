@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7873804258745944938}
   - component: {fileID: 2629461892882268306}
   - component: {fileID: 4347231418247045834}
-  - component: {fileID: 6921354197396349567}
+  - component: {fileID: 6546066827728607943}
   - component: {fileID: 6248550900263281280}
   - component: {fileID: 3561195904730791856}
   - component: {fileID: 2233686537372028220}
@@ -141,8 +141,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!70 &6921354197396349567
-CapsuleCollider2D:
+--- !u!61 &6546066827728607943
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -173,9 +173,19 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.01503932, y: -0.2594318}
-  m_Size: {x: 1.172826, y: 1.481136}
-  m_Direction: 0
+  m_Offset: {x: 0.03564608, y: -0.2464079}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2, y: 2}
+    newSize: {x: 2, y: 2}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.184101, y: 1.39348}
+  m_EdgeRadius: 0
 --- !u!82 &6248550900263281280
 AudioSource:
   m_ObjectHideFlags: 0
@@ -323,15 +333,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runSpeed: 10
   jumpForce: 30
-  feetRadius: 1
+  feetRadius: 0.13
   lookDownDistance: 4
   airControll: 1
   rawInput: 1
-  feetSize: 0.8
   feet: {fileID: 3046393642506268637}
   groundMask:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 200
 --- !u!114 &4398668166547142065
 MonoBehaviour:
   m_ObjectHideFlags: 0

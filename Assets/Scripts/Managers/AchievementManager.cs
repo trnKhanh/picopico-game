@@ -32,7 +32,7 @@ public class AchievementManager : MonoBehaviour
     public void UnSubribeToPlayerEvent()
     {
         PlayerController.onAppeared -= PlayerController_onAppeared;
-        PlayerController.onDied -= PlayerController_onDied;
+        PlayerController.onDissapeared -= PlayerController_onDied;
     }
 
     public void SubribeToPlayerEvent()
@@ -40,7 +40,7 @@ public class AchievementManager : MonoBehaviour
         UnSubribeToPlayerEvent();
 
         PlayerController.onAppeared += PlayerController_onAppeared;
-        PlayerController.onDied += PlayerController_onDied;
+        PlayerController.onDissapeared += PlayerController_onDied;
     }
 
     private void PlayerController_onAppeared(object sender, EventArgs e)

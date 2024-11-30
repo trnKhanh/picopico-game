@@ -1,10 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using static SceneLoadingManager;
 
-public class SceneStateManager : MonoBehaviour
+public class SceneStateManager : NetworkBehaviour
 {
+    [SerializeField] private SceneType nextScene;
+
     public static SceneStateManager Instance { get; private set; }
 
     private List<PlayerController> players = new List<PlayerController>();
@@ -19,20 +23,26 @@ public class SceneStateManager : MonoBehaviour
         Instance = this;
     }
 
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
-        SubribeToPlayerEvent();
+        if (IsServer)
+        {
+            SubribeToPlayerEvent();
+        }
     }
 
-    private void OnDisable()
+    public override void OnNetworkDespawn()
     {
-        UnSubribeToPlayerEvent();
+        if (IsServer)
+        {
+            UnSubribeToPlayerEvent();
+        }
     }
 
     public void UnSubribeToPlayerEvent()
     {
         PlayerController.onAppeared -= PlayerController_onAppeared;
-        PlayerController.onDied -= PlayerController_onDied;
+        PlayerController.onDissapeared -= PlayerController_onDied;
     }
 
     public void SubribeToPlayerEvent()
@@ -40,7 +50,7 @@ public class SceneStateManager : MonoBehaviour
         UnSubribeToPlayerEvent();
 
         PlayerController.onAppeared += PlayerController_onAppeared;
-        PlayerController.onDied += PlayerController_onDied;
+        PlayerController.onDissapeared += PlayerController_onDied;
     }
 
     private void PlayerController_onAppeared(object sender, EventArgs e)
@@ -52,9 +62,18 @@ public class SceneStateManager : MonoBehaviour
     {
         players.Remove((PlayerController) sender);
 
-        //if (players.Count == 0)
-        //{
-        //    SceneLoadingManager.Instance.ReloadScene();
-        //}
+        if (players.Count == 0)
+        {
+            SceneLoadingManager.Instance.ReloadScene(true);
+        }
+    }
+
+    public void End()
+    {
+        Debug.Log("END");
+        if (IsServer)
+        {
+            SceneLoadingManager.Instance.LoadScene(nextScene, true);
+        }
     }
 }

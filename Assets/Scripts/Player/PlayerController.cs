@@ -12,7 +12,7 @@ public class PlayerController : NetworkBehaviour, IDamgable
     [SerializeField] private float invincibleFadedAmount = 0.4f;
 
     static public event EventHandler onAppeared;
-    static public event EventHandler onDied;
+    static public event EventHandler onDissapeared;
     public event EventHandler onHit;
 
     private PlayerMovement m_playerMovement;
@@ -65,28 +65,6 @@ public class PlayerController : NetworkBehaviour, IDamgable
         }
     }
 
-
-    //private void OnEnable()
-    //{
-    //    if (IsOwner)
-    //    {
-    //        SubcribePlayerMovementEvent();
-    //    }
-
-    //    if (IsServer)
-    //    {
-    //        onAppeared?.Invoke(this, EventArgs.Empty);
-    //    }
-    //}
-
-    //private void OnDisable()
-    //{
-    //    if (IsOwner)
-    //    {
-    //        UnSubcribePlayerMovementEvent();
-    //    }
-    //}
-
     private void Update()
     {
         if (IsOwner)
@@ -95,8 +73,7 @@ public class PlayerController : NetworkBehaviour, IDamgable
             UpdateAnimation();
         } else
         {
-            transform.position = nv_position.Value;
-            transform.localScale = nv_localScale.Value;
+            UpdateLocalPosition();
         }
 
     }
@@ -104,6 +81,12 @@ public class PlayerController : NetworkBehaviour, IDamgable
     private void UpdateNetworkPosition()
     {
         UpdateNetworkPositionServerRpc(transform.position, transform.localScale);
+    }
+
+    private void UpdateLocalPosition()
+    {
+        transform.position = nv_position.Value;
+        transform.localScale = nv_localScale.Value;
     }
 
     [ServerRpc]
@@ -153,23 +136,23 @@ public class PlayerController : NetworkBehaviour, IDamgable
     private void PlayerMovement_onMoved(object sender, EventArgs e)
     {
         m_animator.SetBool(k_running, true);
-        UpdateIsRunningYServerRpc(true);
+        UpdateIsRunningServerRpc(true);
     }
 
     private void PlayerMovement_onStopped(object sender, EventArgs e)
     {
         m_animator.SetBool(k_running, false);
-        UpdateIsRunningYServerRpc(false);
+        UpdateIsRunningServerRpc(false);
     }
 
     [ServerRpc]
-    private void UpdateIsRunningYServerRpc(bool isRunning)
+    private void UpdateIsRunningServerRpc(bool isRunning)
     {
-        UpdateIsRunningYClientRpc(isRunning);
+        UpdateIsRunningClientRpc(isRunning);
     }
 
     [ClientRpc]
-    private void UpdateIsRunningYClientRpc(bool isRunning)
+    private void UpdateIsRunningClientRpc(bool isRunning)
     {
         m_animator.SetBool(k_running, isRunning);
     }
@@ -271,12 +254,6 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void DieEffect()
     {
-        // Only owner fires events
-        if (IsOwner)
-        {
-            onDied?.Invoke(this, EventArgs.Empty);
-        }
-
         m_playerMovement.enabled = false;
         m_playerAudioController.Play(PlayerAudioController.PlayerAudioState.Die);
         m_animator.SetTrigger(k_disappear);
@@ -284,10 +261,8 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     public void Disappear()
     {
-        Debug.Log("Disappear");
         if (IsOwner)
         {
-            Debug.Log("Dissapear");
             DisappearServerRpc();
         }
     }
@@ -295,6 +270,7 @@ public class PlayerController : NetworkBehaviour, IDamgable
     [ServerRpc]
     private void DisappearServerRpc()
     {
+        onDissapeared?.Invoke(this, EventArgs.Empty);
         NetworkObject.Despawn(true);
     }
 }

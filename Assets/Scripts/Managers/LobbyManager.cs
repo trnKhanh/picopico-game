@@ -2,10 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 
 public class LobbyManager : MonoBehaviour
@@ -42,6 +47,7 @@ public class LobbyManager : MonoBehaviour
     private Lobby _joinedLobby;
     private float _hostHeartBeatTimeout;
     private float _lobbyPoolingTimeout;
+    private bool _inGame = false;
 
 
     private void Awake()
@@ -66,19 +72,19 @@ public class LobbyManager : MonoBehaviour
         if (_hostLobby == null)
             return;
         
-            _hostHeartBeatTimeout -= Time.deltaTime;
-            if (_hostHeartBeatTimeout < 0.0f)
+        _hostHeartBeatTimeout -= Time.deltaTime;
+        if (_hostHeartBeatTimeout < 0.0f)
+        {
+            _hostHeartBeatTimeout = hostHeartBeatTimeoutMax;
+            try
             {
-                _hostHeartBeatTimeout = hostHeartBeatTimeoutMax;
-                try
-                {
-                    await LobbyService.Instance.SendHeartbeatPingAsync(_hostLobby.Id);
-                }
-                catch (LobbyServiceException e)
-                {
-                    Debug.Log(e);
-                }
+                await LobbyService.Instance.SendHeartbeatPingAsync(_hostLobby.Id);
             }
+            catch (LobbyServiceException e)
+            {
+                Debug.Log(e);
+            }
+        }
         
     }
 
@@ -103,6 +109,10 @@ public class LobbyManager : MonoBehaviour
                     OnKickedFromLobby?.Invoke(this, EventArgs.Empty);
                     _joinedLobby = null;
                 }
+
+                if (!_inGame)
+                    JoinGame(lobby);
+                
             }
             catch (LobbyServiceException e)
             {
@@ -123,6 +133,26 @@ public class LobbyManager : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private async void JoinGame(Lobby lobby)
+    {
+        if (lobby == null || lobby.Data == null)
+            return;
+
+        if (lobby.Data.ContainsKey(KEY_RELAY_CODE))
+        {
+            _inGame = true;
+            // Game was started
+            string relayCode = lobby.Data[KEY_RELAY_CODE].Value;
+
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
+
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            NetworkManager.Singleton.StartClient();
+        }
     }
 
     // Authenticate a player with corresponding playerName
@@ -391,6 +421,40 @@ public class LobbyManager : MonoBehaviour
                 await LobbyService.Instance.RemovePlayerAsync(_hostLobby.Id, playerId);
             }
             catch (LobbyServiceException e)
+            {
+                Debug.Log(e);
+            }
+        }
+    }
+
+    public async void StartGame()
+    {
+        if (_hostLobby != null)
+        {
+            try
+            {
+                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(_hostLobby.MaxPlayers - 1);
+                string relayCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+                RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.StartHost();
+
+                UpdateLobbyOptions options = new UpdateLobbyOptions
+                {
+                    IsPrivate = true,
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        { KEY_RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayCode)}
+                    }
+                };
+                await LobbyService.Instance.UpdateLobbyAsync(_hostLobby.Id, options);
+            }
+            catch (LobbyServiceException e)
+            {
+                Debug.Log(e);
+            }
+            catch (RelayServiceException e)
             {
                 Debug.Log(e);
             }
