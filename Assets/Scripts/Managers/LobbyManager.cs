@@ -545,4 +545,9 @@ public class LobbyManager : MonoBehaviour
 
         return data;
     }
+
+    public Lobby GetJoinedLobby()
+    {
+        return m_joinedLobby;
+    }
 }
