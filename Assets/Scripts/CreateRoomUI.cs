@@ -17,7 +17,7 @@ public class CreateRoomUI : MonoBehaviour
     {
         createRoomButton.onClick.AddListener(async () =>
         {
-            await LobbyManager.Instance.CreateLobby(roomName.text, 2, isPrivate.isOn);
+            await LobbyManager.Instance.CreateLobby(roomName.text, 4, isPrivate.isOn);
             roomCanvas.gameObject.SetActive(true);
             gameObject.SetActive(false);
         });

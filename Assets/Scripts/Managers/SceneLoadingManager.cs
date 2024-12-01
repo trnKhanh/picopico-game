@@ -45,28 +45,43 @@ public class SceneLoadingManager : NetworkBehaviour
 
     private void Start()
     {
-        LoadScene(localDefaultType, false);
+        LoadScene(localDefaultType, false, false);
     }
 
     private void OnEnable()
     {
-        //LobbyManager.Instance.OnKickedFromLobby += LobbyManager_OnKickedFromLobby;
-        //LobbyManager.Instance.OnLeftLobby += LobbyManager_OnKickedFromLobby;
+        SubribeToLobbyManagerEvents();
     }
 
     private void OnDisable()
     {
-        
+        UnSubribeToLobbyManagerEvents();
     }
 
     private void UnSubribeToLobbyManagerEvents()
     {
-
+        LobbyManager.OnKickedFromLobby -= LobbyManager_OnKickedFromLobby;
+        LobbyManager.OnLeftLobby -= LobbyManager_OnLeftLobby;
     }
 
     private void SubribeToLobbyManagerEvents()
     {
+        Debug.Log("SceneLoadingManager:SubribeToLobbyManagerEvents");
+        UnSubribeToLobbyManagerEvents();
+        LobbyManager.OnKickedFromLobby += LobbyManager_OnKickedFromLobby;
+        LobbyManager.OnLeftLobby += LobbyManager_OnLeftLobby;
+    }
 
+    private void LobbyManager_OnLeftLobby(object sender, EventArgs e)
+    {
+        Debug.Log("SceneLoadingManager:LobbyManager_OnLeftLobby");
+        LoadScene(localDefaultType, false, false);
+    }
+
+    private void LobbyManager_OnKickedFromLobby(object sender, EventArgs e)
+    {
+        Debug.Log("SceneLoadingManager:LobbyManager_OnKickedFromLobby");
+        LoadScene(localDefaultType, false, false);
     }
 
     public override void OnNetworkSpawn()
@@ -77,7 +92,7 @@ public class SceneLoadingManager : NetworkBehaviour
             networkSceneManager.OnLoadComplete -= NetworkSceneManager_OnLoadComplete;
             networkSceneManager.OnLoadComplete += NetworkSceneManager_OnLoadComplete;
 
-            LoadScene(multiplayerDefaultScene, true);
+            LoadScene(multiplayerDefaultScene, true, true);
         } 
     }
     public override void OnNetworkDespawn()
@@ -100,18 +115,26 @@ public class SceneLoadingManager : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void ChangeSceneClientRpc(string sceneName)
+    {
+        m_curSceneName = sceneName;
+    }
+
     public void ReloadScene(bool useNetwork = true)
     {
         LoadScene(m_curSceneName, useNetwork);
     }
 
-    public void LoadScene(SceneType sceneType, bool useNetwork = true)
+    public void LoadScene(SceneType sceneType, bool force, bool useNetwork)
     {
         string sceneName = GetSceneName(sceneType);
+        if (!force && sceneName == m_curSceneName)
+            return;
 
         LoadScene(sceneName, useNetwork);
     }
-    public void LoadScene(string sceneName, bool useNetwork = true)
+    private void LoadScene(string sceneName, bool useNetwork = true)
     {
         if (sceneName != null)
         {
@@ -130,6 +153,7 @@ public class SceneLoadingManager : NetworkBehaviour
 
                     NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
                     networkSceneManager.LoadScene(m_curSceneName, LoadSceneMode.Single);
+                    ChangeSceneClientRpc(m_curSceneName);
                 }
                 catch (Exception e)
                 {

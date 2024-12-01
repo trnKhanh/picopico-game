@@ -29,6 +29,11 @@ public class MainMenuUI : MonoBehaviour
 
     void Start()
     {
+       
+    }
+
+    private void OnEnable()
+    {
         hostGameButton.onClick.AddListener(() =>
         {
             createRoomCanvas.gameObject.SetActive(true);
@@ -36,32 +41,54 @@ public class MainMenuUI : MonoBehaviour
         quickJoinGameButton.onClick.AddListener(async () =>
         {
             await LobbyManager.Instance.QuickJoinLobby();
+            roomCanvas.gameObject.SetActive(true);
         });
         joinGameButton.onClick.AddListener(async () =>
         {
             await LobbyManager.Instance.JoinLobbyByCode(joinCode.text);
+            roomCanvas.gameObject.SetActive(true);
         });
         quitGameButton.onClick.AddListener(() =>
         {
             Application.Quit();
         });
-        confirmGameButton.onClick.AddListener(() =>
+
+        if (LobbyManager.Instance.IsSignedIn())
         {
-            EnteredPlayerName();
-        });
+            m_animator.SetTrigger(k_enteredPlayerName);
+        }
+        else
+        {
+            confirmGameButton.onClick.AddListener(() =>
+            {
+                EnteredPlayerName();
+            });
+        }
 
         SubribeToLobbyEvents();
+    }
+
+    private void OnDisable()
+    {
+        UnSubribeToLobbyEvents();
+
+        hostGameButton.onClick.RemoveAllListeners();
+        quickJoinGameButton.onClick.RemoveAllListeners();
+        joinGameButton.onClick.RemoveAllListeners();
+        quitGameButton.onClick.RemoveAllListeners();
+        confirmGameButton.onClick.RemoveAllListeners();
+
     }
 
     private void SubribeToLobbyEvents()
     {
         UnSubribeToLobbyEvents();
-        LobbyManager.Instance.OnJoinedLobby += LobbyManager_OnJoinedLobby;
+        LobbyManager.OnJoinedLobby += LobbyManager_OnJoinedLobby;
     }
 
     private void UnSubribeToLobbyEvents()
     {
-        LobbyManager.Instance.OnJoinedLobby -= LobbyManager_OnJoinedLobby;
+        LobbyManager.OnJoinedLobby -= LobbyManager_OnJoinedLobby;
     }
 
     private void LobbyManager_OnJoinedLobby(object sender, LobbyManager.LobbyEventArgs e)
@@ -71,7 +98,10 @@ public class MainMenuUI : MonoBehaviour
 
     void EnteredPlayerName()
     {
-        LobbyManager.Instance.Authenticate(playerName.text);
-        m_animator.SetTrigger(k_enteredPlayerName);
+        if (playerName.text != null && playerName.text.Length > 0)
+        {
+            LobbyManager.Instance.Authenticate(playerName.text);
+            m_animator.SetTrigger(k_enteredPlayerName);
+        }
     }
 }

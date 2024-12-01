@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private float yOffset = 3.0f;
 
     public Transform target;
+
+    private List<PlayerController> players = new List<PlayerController>();
     private Vector2 curOffset = Vector2.zero;
 
     private void Awake()
@@ -21,6 +24,48 @@ public class CameraManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    private void OnEnable()
+    {
+        SubribeToPlayerEvent();
+    }
+
+    private void OnDisable()
+    {
+        UnSubribeToPlayerEvent();
+    }
+
+    public void SubribeToPlayerEvent()
+    {
+        UnSubribeToPlayerEvent();
+
+        PlayerController.onAppeared += PlayerController_onAppeared;
+        PlayerController.onDissapeared += PlayerController_onDied;
+    }
+
+    private void PlayerController_onAppeared(object sender, EventArgs e)
+    {
+        PlayerController player = (PlayerController)sender;
+        if (player.IsOwner)
+        {
+            target = player.transform;
+        }
+        players.Add(player);
+    }
+
+    private void PlayerController_onDied(object sender, EventArgs e)
+    {
+        PlayerController player = (PlayerController)sender;
+        players.Remove(player);
+
+        if (players.Count != 0)
+        {
+            if (player.IsOwner)
+            {
+                target = players[0].transform;
+            }
+        }
     }
 
     private void Update()
@@ -45,4 +90,12 @@ public class CameraManager : MonoBehaviour
     {
         curOffset = offset;
     }
+
+    public void UnSubribeToPlayerEvent()
+    {
+        PlayerController.onAppeared -= PlayerController_onAppeared;
+        PlayerController.onDissapeared -= PlayerController_onDied;
+    }
+
+    
 }

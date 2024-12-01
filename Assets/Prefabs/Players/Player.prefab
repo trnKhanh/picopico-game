@@ -242,7 +242,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -319,6 +319,9 @@ MonoBehaviour:
   invincibleTime: 2
   invincibleFadedInterval: 0.2
   invincibleFadedAmount: 0.4
+  playerColours:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &7579706046935307094
 MonoBehaviour:
   m_ObjectHideFlags: 0

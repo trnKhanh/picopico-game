@@ -7,9 +7,9 @@ using static SceneLoadingManager;
 
 public class SceneStateManager : NetworkBehaviour
 {
-    [SerializeField] private SceneType nextScene;
+    static public SceneStateManager Instance { get; private set; }
 
-    public static SceneStateManager Instance { get; private set; }
+    [SerializeField] private SceneType nextScene;
 
     private List<PlayerController> players = new List<PlayerController>();
 
@@ -85,7 +85,7 @@ public class SceneStateManager : NetworkBehaviour
         if (IsServer)
         {
             AudioManager.Instance.PlaySFX(AudioManager.SFXState.End);
-            SceneLoadingManager.Instance.LoadScene(nextScene, true);
+            SceneLoadingManager.Instance.LoadScene(nextScene, true, true);
         }
     }
 }

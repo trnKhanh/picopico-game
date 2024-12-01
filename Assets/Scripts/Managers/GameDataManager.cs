@@ -51,7 +51,7 @@ public class GameDataManager : MonoBehaviour
 
     private void OnDisable()
     {
-        
+        UnSubcribeToPlayerControllerEvents();
     }
 
     private void SubcribeToPlayerControllerEvents()
