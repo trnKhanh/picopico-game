@@ -149,11 +149,8 @@ public class LobbyManager : MonoBehaviour
 
     private void LobbyEvents_KickedFromLobby()
     {
-        if (m_joinedLobby != null)
-        {
-            OnKickedFromLobby?.Invoke(this, EventArgs.Empty);
-            m_joinedLobby = null;
-        }
+        OnKickedFromLobby?.Invoke(this, EventArgs.Empty);
+        m_joinedLobby = null;
     }
 
     private void LobbyEvents_LobbyChanged(ILobbyChanges changes)
@@ -465,13 +462,11 @@ public class LobbyManager : MonoBehaviour
                 }
                 else
                 {
-                    m_joinedLobby = null;
                     await LobbyService.Instance.RemovePlayerAsync(lobbyId, AuthenticationService.Instance.PlayerId);
                 }
 
-
+                m_joinedLobby = null;
                 NetworkManager.Singleton.Shutdown();
-                OnLeftLobby?.Invoke(this, EventArgs.Empty);
             }
             catch (LobbyServiceException e)
             {

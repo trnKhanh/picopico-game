@@ -55,24 +55,36 @@ public class SceneStateManager : NetworkBehaviour
 
     private void PlayerController_onAppeared(object sender, EventArgs e)
     {
-        players.Add((PlayerController) sender);
+        PlayerController player = (PlayerController)sender;
+        if (player.IsOwner)
+        {
+            CameraManager.Instance.target = player.transform;
+        }
+        players.Add(player);
     }
 
     private void PlayerController_onDied(object sender, EventArgs e)
     {
-        players.Remove((PlayerController) sender);
+        PlayerController player = (PlayerController)sender;
+        players.Remove(player);
 
         if (players.Count == 0)
         {
             SceneLoadingManager.Instance.ReloadScene(true);
+        } else
+        {
+            if (player.IsOwner)
+            {
+                CameraManager.Instance.target = players[0].transform;
+            }
         }
     }
 
     public void End()
     {
-        Debug.Log("END");
         if (IsServer)
         {
+            AudioManager.Instance.PlaySFX(AudioManager.SFXState.End);
             SceneLoadingManager.Instance.LoadScene(nextScene, true);
         }
     }

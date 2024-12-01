@@ -17,6 +17,8 @@ public class AudioManager : MonoBehaviour
     {
         Confirm,
         Cancle,
+        Achievement,
+        End,
     }
 
     [Serializable]

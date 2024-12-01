@@ -47,6 +47,10 @@ MonoBehaviour:
   backgroundAudioClips:
   - state: 0
     audioClip: {fileID: 8300000, guid: dd15eca6827df454abe37c23cdf5dc7c, type: 3}
-  sfxAudioClips: []
+  sfxAudioClips:
+  - state: 2
+    audioClip: {fileID: 8300000, guid: cea96f79fad5d449db09c6456d01a6c6, type: 3}
+  - state: 3
+    audioClip: {fileID: 8300000, guid: df76e842439cd4ad0a95bff7c9b87fe6, type: 3}
   backgroundAudioSource: {fileID: 0}
   sfxAudioSource: {fileID: 0}

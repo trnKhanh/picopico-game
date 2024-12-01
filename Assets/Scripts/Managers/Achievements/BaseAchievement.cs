@@ -11,12 +11,11 @@ public abstract class BaseAchievement : MonoBehaviour
     public string description = null;
     public abstract void UpdateState(object sender, EventArgs e);
 
-    public bool isAchieved { get; private set; } = false;
+    public bool isAchieved = false;
 
 
     private void OnEnable()
     {
-        Debug.Log("BaseAchievement:OnEnable");
         GameDataManager.onUpdatedData += UpdateState;
     }
 
@@ -30,7 +29,6 @@ public abstract class BaseAchievement : MonoBehaviour
     {
         if (!isAchieved)
         {
-            Debug.Log("BaseAchievement:Achieved");
             isAchieved = true;
             onAchieved?.Invoke(this, EventArgs.Empty);
         }

@@ -13,7 +13,9 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     static public event EventHandler onAppeared;
     static public event EventHandler onDissapeared;
+    
     public event EventHandler onHit;
+    public event EventHandler onDied;
 
     public PlayerMovement playerMovement { get; private set; }
     public PlayerAudioController playerAudioController { get; private set; }
@@ -47,7 +49,6 @@ public class PlayerController : NetworkBehaviour, IDamgable
         if (IsOwner)
         {
             SubcribePlayerMovementEvent();
-            CameraManager.Instance.target = transform;
         }
 
         if (IsServer)
@@ -258,6 +259,11 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void DieEffect()
     {
+        // Only owner fires events
+        if (IsOwner)
+        {
+            onDied?.Invoke(this, EventArgs.Empty);
+        }
         playerMovement.enabled = false;
         playerAudioController.Play(PlayerAudioController.PlayerAudioState.Die);
         m_animator.SetTrigger(k_disappear);
