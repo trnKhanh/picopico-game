@@ -1,18 +1,27 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class EnemyBehaviour : MonoBehaviour
+public abstract class EnemyBehaviour : NetworkBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public event EventHandler onMoved;
+    public event EventHandler onStopped;
+    public event EventHandler onChangedDirection;
+
+    protected void InvokeOnMoved(EventArgs e)
     {
-        
+        onMoved?.Invoke(this, e);
     }
 
-    // Update is called once per frame
-    void Update()
+    protected void InvokeOnStopped(EventArgs e)
     {
-        
+        onStopped?.Invoke(this, e);
+    }
+
+    protected void InvokeOnChangedDirection(EventArgs e)
+    {
+        onChangedDirection?.Invoke(this, e);
     }
 }

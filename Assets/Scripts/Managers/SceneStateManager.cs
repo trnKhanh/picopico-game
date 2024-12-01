@@ -1,10 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using static SceneLoadingManager;
 
-public class SceneStateManager : MonoBehaviour
+public class SceneStateManager : NetworkBehaviour
 {
+    [SerializeField] private SceneType nextScene;
+
     public static SceneStateManager Instance { get; private set; }
 
     private List<PlayerController> players = new List<PlayerController>();
@@ -19,35 +23,69 @@ public class SceneStateManager : MonoBehaviour
         Instance = this;
     }
 
-    public void UnSubribeToPlayerEvent(PlayerController player)
+    public override void OnNetworkSpawn()
     {
-        player.onDied -= PlayerController_onDied;
-        player.onHit -= PlayerController_onHit;
+        if (IsServer)
+        {
+            SubribeToPlayerEvent();
+        }
     }
 
-    public void SubribeToPlayerEvent(PlayerController player)
+    public override void OnNetworkDespawn()
     {
-        UnSubribeToPlayerEvent(player);
+        if (IsServer)
+        {
+            UnSubribeToPlayerEvent();
+        }
+    }
 
+    public void UnSubribeToPlayerEvent()
+    {
+        PlayerController.onAppeared -= PlayerController_onAppeared;
+        PlayerController.onDissapeared -= PlayerController_onDied;
+    }
+
+    public void SubribeToPlayerEvent()
+    {
+        UnSubribeToPlayerEvent();
+
+        PlayerController.onAppeared += PlayerController_onAppeared;
+        PlayerController.onDissapeared += PlayerController_onDied;
+    }
+
+    private void PlayerController_onAppeared(object sender, EventArgs e)
+    {
+        PlayerController player = (PlayerController)sender;
+        if (player.IsOwner)
+        {
+            CameraManager.Instance.target = player.transform;
+        }
         players.Add(player);
-
-        player.onDied += PlayerController_onDied;
-        player.onHit += PlayerController_onHit;
     }
 
     private void PlayerController_onDied(object sender, EventArgs e)
     {
-        Debug.Log("die");
-        players.Remove((PlayerController) sender);
+        PlayerController player = (PlayerController)sender;
+        players.Remove(player);
 
         if (players.Count == 0)
         {
-            SceneLoadingManager.Instance.ReloadScene();
+            SceneLoadingManager.Instance.ReloadScene(true);
+        } else
+        {
+            if (player.IsOwner)
+            {
+                CameraManager.Instance.target = players[0].transform;
+            }
         }
     }
 
-    private void PlayerController_onHit(object sender, EventArgs e)
+    public void End()
     {
-
+        if (IsServer)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.SFXState.End);
+            SceneLoadingManager.Instance.LoadScene(nextScene, true);
+        }
     }
 }

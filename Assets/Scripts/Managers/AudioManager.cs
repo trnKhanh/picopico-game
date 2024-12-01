@@ -17,6 +17,8 @@ public class AudioManager : MonoBehaviour
     {
         Confirm,
         Cancle,
+        Achievement,
+        End,
     }
 
     [Serializable]
@@ -48,7 +50,6 @@ public class AudioManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(Instance);
     }
 
     private void Start()

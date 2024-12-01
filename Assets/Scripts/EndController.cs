@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class EndController : MonoBehaviour
+public class EndController : NetworkBehaviour
 {
     private Animator m_animator;
 
@@ -17,23 +18,26 @@ public class EndController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!IsServer)
+            return;
+
         if (m_ended)
             return;
 
         if (collision.gameObject.tag == "Player")
         {
+            m_ended = true;
             EndEffect();
         }
     }
 
     private void EndEffect()
     {
-        m_ended = true;
         m_animator.SetTrigger(k_press);
     }
 
     private void End()
     {
-        SceneLoadingManager.Instance.LoadScene(SceneLoadingManager.SceneType.Tutorial);
+        SceneStateManager.Instance.End();
     }
 }

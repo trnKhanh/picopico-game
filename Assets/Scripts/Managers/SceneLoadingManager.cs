@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneLoadingManager : MonoBehaviour
+public class SceneLoadingManager : NetworkBehaviour
 {
     static public SceneLoadingManager Instance { get; private set; }
 
@@ -12,6 +13,7 @@ public class SceneLoadingManager : MonoBehaviour
     {
         Menu,
         Tutorial,
+        UNKNOWN,
     }
 
     [Serializable]
@@ -23,7 +25,8 @@ public class SceneLoadingManager : MonoBehaviour
 
     [SerializeField] private Scene[] scenes;
 
-    public SceneType defaultScene = SceneType.Menu;
+    public SceneType localDefaultType = SceneType.Menu;
+    public SceneType multiplayerDefaultScene = SceneType.Menu;
 
     private string m_curSceneName;
 
@@ -38,31 +41,102 @@ public class SceneLoadingManager : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(Instance);
-
-        LoadScene(defaultScene);
     }
 
     private void Start()
     {
-        m_curSceneName = SceneManager.GetActiveScene().name;
+        LoadScene(localDefaultType, false);
     }
 
-    public void ReloadScene()
+    private void OnEnable()
     {
-        if (m_curSceneName != null)
+        //LobbyManager.Instance.OnKickedFromLobby += LobbyManager_OnKickedFromLobby;
+        //LobbyManager.Instance.OnLeftLobby += LobbyManager_OnKickedFromLobby;
+    }
+
+    private void OnDisable()
+    {
+        
+    }
+
+    private void UnSubribeToLobbyManagerEvents()
+    {
+
+    }
+
+    private void SubribeToLobbyManagerEvents()
+    {
+
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
         {
-            SceneManager.LoadScene(m_curSceneName);
+            NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
+            networkSceneManager.OnLoadComplete -= NetworkSceneManager_OnLoadComplete;
+            networkSceneManager.OnLoadComplete += NetworkSceneManager_OnLoadComplete;
+
+            LoadScene(multiplayerDefaultScene, true);
+        } 
+    }
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer)
+        {
+            NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
+            networkSceneManager.OnLoadComplete -= NetworkSceneManager_OnLoadComplete;
         }
     }
 
-    public void LoadScene(SceneType sceneType)
+    private void NetworkSceneManager_OnLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    {
+        SceneType sceneType = GetSceneType(sceneName);
+        switch (sceneType)
+        {
+            case SceneType.Tutorial:
+                SpawnManager.Instance.SpawnPlayer(clientId);
+                break;
+        }
+    }
+
+    public void ReloadScene(bool useNetwork = true)
+    {
+        LoadScene(m_curSceneName, useNetwork);
+    }
+
+    public void LoadScene(SceneType sceneType, bool useNetwork = true)
     {
         string sceneName = GetSceneName(sceneType);
 
+        LoadScene(sceneName, useNetwork);
+    }
+    public void LoadScene(string sceneName, bool useNetwork = true)
+    {
         if (sceneName != null)
         {
-            SceneManager.LoadSceneAsync(sceneName);
             m_curSceneName = sceneName;
+
+            if (!useNetwork)
+            {
+                SceneManager.LoadSceneAsync(m_curSceneName, LoadSceneMode.Single);
+            }
+            else
+            {
+                try
+                {
+                    if (!IsServer)
+                        throw new Exception("Only Server is allowed to change scene");
+
+                    NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
+                    networkSceneManager.LoadScene(m_curSceneName, LoadSceneMode.Single);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($"Try loading scene using {nameof(NetworkSceneManager)} but get \"{e.Message}\". Load local scene instead.");
+                    SceneManager.LoadSceneAsync(m_curSceneName, LoadSceneMode.Single);
+                }
+            }
         }
     }
 
@@ -76,5 +150,17 @@ public class SceneLoadingManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private SceneType GetSceneType(string sceneName)
+    {
+        foreach (Scene scene in scenes)
+        {
+            if (scene.sceneType.ToString().ToLower() == sceneName.ToLower())
+            {
+                return scene.sceneType;
+            }
+        }
+        return SceneType.UNKNOWN;
     }
 }
