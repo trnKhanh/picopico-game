@@ -42,6 +42,8 @@ public class CommandManager : MonoBehaviour
     private void CommandManager_OnUpdatedLobby(object sender, LobbyManager.LobbyEventArgs e)
     {
         Lobby lobby = e.lobby;
+        if (lobby == null)
+            return;
         Debug.Log($"Update lobby: {lobby.Name}; {lobby.MaxPlayers}; {lobby.IsPrivate}");
         foreach (Player player in lobby.Players)
         {
