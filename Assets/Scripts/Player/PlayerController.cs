@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class PlayerController : NetworkBehaviour, IDamgable
     [SerializeField] private float invincibleTime = 2.0f;
     [SerializeField] private float invincibleFadedInterval = 0.2f;
     [SerializeField] private float invincibleFadedAmount = 0.4f;
+    [SerializeField] private RectTransform floatingText;
 
     static public event EventHandler onAppeared;
     static public event EventHandler onDissapeared;
@@ -23,11 +25,14 @@ public class PlayerController : NetworkBehaviour, IDamgable
     private Animator m_animator;
     private Rigidbody2D m_rigidbody;
     private SpriteRenderer m_spriteRenderer;
+    private List<IInteractable> m_interactables = new List<IInteractable>();
+    private bool m_isFacingRight = true;
 
     private NetworkVariable<Vector3> nv_position = new NetworkVariable<Vector3>();
     private NetworkVariable<Vector3> nv_localScale = new NetworkVariable<Vector3>();
     private NetworkVariable<int> nv_curHealth = new NetworkVariable<int>();
     private NetworkVariable<bool> nv_isInvincible = new NetworkVariable<bool>(false);
+    private NetworkVariable<bool> nv_isFacingRight = new NetworkVariable<bool>(true);
     private NetworkVariable<bool> nv_died = new NetworkVariable<bool>(false);
     private NetworkVariable<bool> nv_isRunning = new NetworkVariable<bool>(false);
     private NetworkVariable<float> nv_velocityY = new NetworkVariable<float>(0f);
@@ -43,9 +48,9 @@ public class PlayerController : NetworkBehaviour, IDamgable
     {
         playerMovement = GetComponent<PlayerMovement>();
         playerAudioController = GetComponent<PlayerAudioController>();
-        m_animator = GetComponent<Animator>();
-        m_rigidbody = GetComponent<Rigidbody2D>();
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_animator = GetComponentInChildren<Animator>();
+        m_rigidbody = GetComponentInChildren<Rigidbody2D>();
+        m_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     public override void OnNetworkSpawn()
@@ -82,12 +87,31 @@ public class PlayerController : NetworkBehaviour, IDamgable
         {
             UpdateNetworkPosition();
             UpdateNetworkAnimation();
+            UpdateFloatingText();
         } else
         {
             UpdateLocalPosition();
             UpdateLocalAnimation();
         }
 
+    }
+
+    private void UpdateFloatingText()
+    {
+        if (m_interactables.Count > 0)
+        {
+            floatingText.GetComponentInChildren<TMP_Text>().text = "Press E";
+            floatingText.gameObject.SetActive(true);
+
+            if (InputManager.Instance.interact)
+            {
+                m_interactables[0].Interact();
+            }
+        }
+        else
+        {
+            floatingText.gameObject.SetActive(false);
+        }
     }
 
     private void UpdateNetworkPosition()
@@ -109,13 +133,13 @@ public class PlayerController : NetworkBehaviour, IDamgable
     private void UpdateLocalAnimation()
     {
         m_animator.SetBool(k_running, nv_isRunning.Value);
+        m_spriteRenderer.flipX = !nv_isFacingRight.Value;
         m_animator.SetFloat(k_velocityY, nv_velocityY.Value);
     }
 
     private void SubcribeNetworkVariables()
     {
         UpdateToNetworkVariables();
-        Debug.Log("SubcribeNetworkVariables");
         UnSubcribeNetworkVariables();
         nv_playerColour.OnValueChanged += playerColour_onValueChange;
     }
@@ -127,13 +151,11 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void UnSubcribeNetworkVariables()
     {
-        Debug.Log("UnSubcribeNetworkVariables");
         nv_playerColour.OnValueChanged -= playerColour_onValueChange;
     }
 
     private void playerColour_onValueChange(Color previousValue, Color newValue)
     {
-        Debug.Log($"New color: {newValue}");
         m_spriteRenderer.color = newValue;
     }
 
@@ -214,9 +236,15 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void PlayerMovement_onChangedDirection(object sender, EventArgs e)
     {
-        Vector3 localScale = transform.localScale;
-        localScale.x *= -1;
-        transform.localScale = localScale;
+        m_isFacingRight = !m_isFacingRight;
+        m_spriteRenderer.flipX = !m_isFacingRight;
+        UpdateIsFacingRightServerRpc(m_isFacingRight);
+    }
+
+    [ServerRpc]
+    private void UpdateIsFacingRightServerRpc(bool isFacingRight)
+    {
+        nv_isFacingRight.Value = isFacingRight;
     }
 
     private void PlayerMovement_onJumped(object sender, EventArgs e)
@@ -331,5 +359,31 @@ public class PlayerController : NetworkBehaviour, IDamgable
     private void DisappearServerRpc()
     {
         NetworkObject.Despawn(true);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (IsOwner)
+        {
+            Debug.Log("PlayerController:OnCollisionEnter2D");
+            IInteractable interactable;
+            if (collider.gameObject.TryGetComponent<IInteractable>(out interactable))
+            {
+                Debug.Log("PlayerController:IInteractable");
+                m_interactables.Add(interactable);
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collider)
+    {
+        if (IsOwner)
+        {
+            IInteractable interactable;
+            if (collider.gameObject.TryGetComponent<IInteractable>(out interactable))
+            {
+                m_interactables.Remove(interactable);
+            }
+        }
     }
 }

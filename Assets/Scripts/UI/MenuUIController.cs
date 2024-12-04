@@ -48,7 +48,10 @@ public class MenuUIController: MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            EnteredPlayerName();
+            if (confirmGameButton.gameObject.activeInHierarchy)
+            {
+                EnteredPlayerName();
+            }
         }
     }
 

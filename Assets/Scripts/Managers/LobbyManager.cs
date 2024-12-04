@@ -225,7 +225,7 @@ public class LobbyManager : MonoBehaviour
 
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
-        catch (AuthenticationException e)
+        catch (Exception e)
         {
             Debug.Log(e);
         }

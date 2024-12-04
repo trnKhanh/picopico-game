@@ -13,6 +13,7 @@ public class SceneLoadingManager : NetworkBehaviour
     {
         Menu,
         Tutorial,
+        Credit,
         UNKNOWN,
     }
 

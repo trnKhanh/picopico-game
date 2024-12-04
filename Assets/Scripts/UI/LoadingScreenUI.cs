@@ -20,11 +20,17 @@ public class LoadingScreenUI : MonoBehaviour
 
     public void Show()
     {
-        loadingScreenPanel.gameObject.SetActive(true);
+        if (Instance != null)
+        {
+            loadingScreenPanel.gameObject.SetActive(true);
+        }
     }
 
     public void Hide()
     {
-        loadingScreenPanel.gameObject.SetActive(false);
+        if (Instance != null)
+        {
+            loadingScreenPanel.gameObject.SetActive(false);
+        }
     }
 }
