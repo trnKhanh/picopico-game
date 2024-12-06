@@ -60,32 +60,60 @@ public class LobbyManager : MonoBehaviour
     {
         Application.wantsToQuit += Application_wantsToQuit;
 
-        SubcribeToNetworkEvents();
+        //SubcribeToNetworkEvents();
         StartCoroutine(SendHeartBeat());
     }
 
-    private void SubcribeToNetworkEvents()
+    //private void SubcribeToNetworkEvents()
+    //{
+    //    NetworkManager.Singleton.OnClientConnectedCallback -= NetworkManager_OnClientConnectedCallback;
+    //    NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+    //}
+
+    //private async void NetworkManager_OnClientConnectedCallback(ulong clientId)
+    //{
+    //    if (NetworkManager.Singleton.LocalClientId != clientId)
+    //    {
+    //        return;
+    //    }
+
+    //    if (m_joinedLobby == null)
+    //        return;
+
+    //    UpdatePlayerOptions updatePlayerOptions = new UpdatePlayerOptions
+    //    {
+    //        Data = CreatePlayerData(),
+    //    };
+
+    //    await LobbyService.Instance.UpdatePlayerAsync(m_joinedLobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
+    //}
+
+    private void OnEnable()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback -= NetworkManager_OnClientConnectedCallback;
-        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+        StartCoroutine(SubribeToNetworkManagerEvents());
     }
 
-    private async void NetworkManager_OnClientConnectedCallback(ulong clientId)
+    private void OnDisable()
     {
-        if (NetworkManager.Singleton.LocalClientId != clientId)
-        {
-            return;
-        }
+        UnSubribeToNetworkManagerEvents();
+    }
 
-        if (m_joinedLobby == null)
-            return;
+    private IEnumerator SubribeToNetworkManagerEvents()
+    {
+        yield return new WaitUntil(() => NetworkManager.Singleton != null);
+        UnSubribeToNetworkManagerEvents();
+        NetworkManager.Singleton.OnClientStopped += NetworkManager_OnClientStopped;
+    }
 
-        UpdatePlayerOptions updatePlayerOptions = new UpdatePlayerOptions
-        {
-            Data = CreatePlayerData(),
-        };
+    private void UnSubribeToNetworkManagerEvents()
+    {
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientStopped -= NetworkManager_OnClientStopped;
+    }
 
-        await LobbyService.Instance.UpdatePlayerAsync(m_joinedLobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
+    private async void NetworkManager_OnClientStopped(bool isHost)
+    {
+        await LeaveLobby();
     }
 
     private bool Application_wantsToQuit()
@@ -454,14 +482,11 @@ public class LobbyManager : MonoBehaviour
     // Leave lobby
     public async Task LeaveLobby()
     {
-        Debug.Log("LeaveLobby_0");
+        NetworkManager.Singleton.Shutdown();
         if (m_joinedLobby != null)
         {
-            Debug.Log("LeaveLobby_1");
             try
             {
-                NetworkManager.Singleton.Shutdown();
-
                 string lobbyId = m_joinedLobby.Id;
                 if (IsPlayerHost(m_joinedLobby, AuthenticationService.Instance.PlayerId))
                 {

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RadishBehaviour : MonoBehaviour, IInteractable
+public class RockBehaviour : MonoBehaviour, IInteractable
 {
     [SerializeField] private Sprite avatar;
     [SerializeField] private string npcName;
@@ -18,41 +18,34 @@ public class RadishBehaviour : MonoBehaviour, IInteractable
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "Hello, I am Radish Boy. Welcome to the forest",
+                    text = "DANGER AHEAD!!! DANGER AHEAD!!!",
                     audioClip = null,
                     avatar = avatar,
                 },
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "The forest is attacked by the snails army. They are killing all the plants!!!",
+                    text = "But we are in danger. The army of snails is comming.",
                     audioClip = null,
                     avatar = avatar,
                 },
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "We cannot deal with such strong foes. Please help us.",
-                    audioClip = null,
+                    text = "The King is surrounded by furious foes. We have no choice but to put our fate in your hands. Please wake the King up!!!",
                     avatar = avatar,
                 },
-                new DialogManager.Dialog
-                {
-                    name = npcName,
-                    text = "However, you cannot eradicate them by yourself. You must get to the Forest King and wake him from the Forever Sleep",
-                    audioClip = null,
-                    avatar = avatar,
-                }
             });
             interacted = true;
-        } else
+        }
+        else
         {
             DialogManager.Instance.PlayDialogs(new List<DialogManager.Dialog>
             {
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "What are you waiting for. Let's go.",
+                    text = "DANGER AHEAD!!! DANGER AHEAD!!!",
                     audioClip = null,
                     avatar = avatar,
                 }

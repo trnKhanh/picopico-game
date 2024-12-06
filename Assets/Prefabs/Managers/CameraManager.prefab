@@ -45,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
-  followSpeed: 2
-  yOffset: 2
+  followSpeed: 10
+  yOffset: 3
   target: {fileID: 0}

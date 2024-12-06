@@ -184,11 +184,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: scenes.Array.size
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: multiplayerDefaultScene
-      value: 1
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: scenes.Array.data[0].sceneName
@@ -213,6 +213,30 @@ PrefabInstance:
     - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: scenes.Array.data[2].sceneType
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: scenes.Array.data[3].sceneName
+      value: Assets/Scenes/Map1.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: scenes.Array.data[3].sceneType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: scenes.Array.data[4].sceneName
+      value: Assets/Scenes/Map2.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: scenes.Array.data[4].sceneType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: scenes.Array.data[5].sceneName
+      value: Assets/Scenes/Map3.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
+      propertyPath: scenes.Array.data[5].sceneType
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6684186631262443300, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -712,7 +736,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 749905182745801357, guid: 73e8f35be9bf24485a4c8a42424ad675, type: 3}
       propertyPath: m_ProtocolType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 921171080668334656, guid: 73e8f35be9bf24485a4c8a42424ad675, type: 3}
       propertyPath: m_LocalPosition.x
@@ -757,6 +781,10 @@ PrefabInstance:
     - target: {fileID: 3125249569026311289, guid: 73e8f35be9bf24485a4c8a42424ad675, type: 3}
       propertyPath: m_Name
       value: NetworkManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 8357154523246539656, guid: 73e8f35be9bf24485a4c8a42424ad675, type: 3}
+      propertyPath: NetworkConfig.PlayerPrefab
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -819,10 +847,6 @@ PrefabInstance:
     - target: {fileID: 4599755775228793203, guid: c9a62c1f874af451990490ff0293cc55, type: 3}
       propertyPath: m_Name
       value: CommandManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 4599755775228793203, guid: c9a62c1f874af451990490ff0293cc55, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8662135594863407392, guid: c9a62c1f874af451990490ff0293cc55, type: 3}
       propertyPath: m_LocalPosition.x

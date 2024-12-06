@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RadishBehaviour : MonoBehaviour, IInteractable
+public class WarriorPlantBehaviour : MonoBehaviour, IInteractable
 {
     [SerializeField] private Sprite avatar;
     [SerializeField] private string npcName;
@@ -18,41 +18,63 @@ public class RadishBehaviour : MonoBehaviour, IInteractable
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "Hello, I am Radish Boy. Welcome to the forest",
+                    text = "M*TH*R F*CK*R. I am born to fight zombies. Not these snails f*ck*r.",
                     audioClip = null,
                     avatar = avatar,
                 },
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "The forest is attacked by the snails army. They are killing all the plants!!!",
+                    text = "Oh. Hello there.",
                     audioClip = null,
                     avatar = avatar,
                 },
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "We cannot deal with such strong foes. Please help us.",
+                    text = "I have lost control in my anger. I am Warrior Plant, the protector of the forest, the first knight of the King,...",
                     audioClip = null,
                     avatar = avatar,
                 },
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "However, you cannot eradicate them by yourself. You must get to the Forest King and wake him from the Forever Sleep",
+                    text = "..., the undying and undefeated warrior, the one should not be eaten, the anti-zombie matter,...",
                     audioClip = null,
                     avatar = avatar,
-                }
+                },
+                new DialogManager.Dialog
+                {
+                    name = npcName,
+                    text = "...blah...blah...",
+                    audioClip = null,
+                    avatar = avatar,
+                },
+                new DialogManager.Dialog
+                {
+                    name = npcName,
+                    text = "... and the last wall of the forest.",
+                    audioClip = null,
+                    avatar = avatar,
+                },
+                new DialogManager.Dialog
+                {
+                    name = npcName,
+                    text = "Sorry for keeping you waiting. The King is ahead this road. Please wake him up while I am holding these piece of sh*t from invading.",
+                    audioClip = null,
+                    avatar = avatar,
+                },
             });
             interacted = true;
-        } else
+        }
+        else
         {
             DialogManager.Instance.PlayDialogs(new List<DialogManager.Dialog>
             {
                 new DialogManager.Dialog
                 {
                     name = npcName,
-                    text = "What are you waiting for. Let's go.",
+                    text = "F*ck these snails. Where the f*ck is all the zombies.",
                     audioClip = null,
                     avatar = avatar,
                 }

@@ -1,10 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
-public class EnemySnailBehaviour : EnemyBehaviour
+public class EnemyRinoBehaviour : EnemyBehaviour
 {
     private void OnCollisionStay2D(Collision2D collision)
     {

@@ -14,6 +14,9 @@ public class SceneLoadingManager : NetworkBehaviour
         Menu,
         Tutorial,
         Credit,
+        Map1,
+        Map2,
+        Map3,
         UNKNOWN,
     }
 
@@ -63,7 +66,8 @@ public class SceneLoadingManager : NetworkBehaviour
 
     private void UnSubribeToNetworkManagerEvents()
     {
-        NetworkManager.Singleton.OnClientStopped -= NetworkManager_OnClientStopped;
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientStopped -= NetworkManager_OnClientStopped;
     }
 
     private void NetworkManager_OnClientStopped(bool isHost)
@@ -107,6 +111,9 @@ public class SceneLoadingManager : NetworkBehaviour
         switch (sceneType)
         {
             case SceneType.Tutorial:
+            case SceneType.Map1:
+            case SceneType.Map2:
+            case SceneType.Map3:
                 SpawnManager.Instance.SpawnPlayer(clientId);
                 break;
         }
