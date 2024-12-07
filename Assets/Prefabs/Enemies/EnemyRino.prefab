@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7897507924499030500}
   - component: {fileID: 8643796226944802993}
   - component: {fileID: 35022108584979014}
-  - component: {fileID: 4984565735996121500}
   - component: {fileID: 5106490749991897295}
   - component: {fileID: 178100066672640451}
   - component: {fileID: 124215275525942890}
@@ -107,7 +106,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 20
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -128,7 +127,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 5449317813229873983}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 3d1ecd83c103d4264b11f6190e0f17b2, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -207,7 +206,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 30, y: 2}
+  m_Size: {x: 50, y: 5}
   m_EdgeRadius: 0
 --- !u!114 &35022108584979014
 MonoBehaviour:
@@ -221,8 +220,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2444943225
-  InScenePlacedSourceGlobalObjectIdHash: 3151544124
+  GlobalObjectIdHash: 669187479
+  InScenePlacedSourceGlobalObjectIdHash: 1153980116
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -230,25 +229,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &4984565735996121500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5449317813229873983}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 956bacc9c73da4f3585e5c3c15e18108, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 1
-  wanderingSpeed: 3
-  chaseSpeed: 5
-  destinationRadius: 0.25
-  wanderingMinRange: 3
-  wanderingMaxRange: 4
-  wanderingInterval: 5
 --- !u!114 &5106490749991897295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,7 +276,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   wanderingSpeed: 5
-  chaseSpeed: 7
+  chaseSpeed: 15
   destinationRadius: 0.25
   wanderingMinRange: 5
   wanderingMaxRange: 7

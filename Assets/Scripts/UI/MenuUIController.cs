@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class MenuUIController: MonoBehaviour
 {
+    [SerializeField] private Button startButton;
     [SerializeField] private Button hostGameButton;
     [SerializeField] private Button quickJoinGameButton;
     [SerializeField] private Button joinGameButton;
@@ -37,11 +38,13 @@ public class MenuUIController: MonoBehaviour
     {
         RefreshUI();
         SubcribeToButtonEvents();
+        SubcribeToLobbyManagerEvents();
     }
 
     private void OnDisable()
     {
         UnSubcribeToButtonEvents();
+        UnSubcribeToLobbyManagerEvents();
     }
 
     private void Update()
@@ -69,6 +72,7 @@ public class MenuUIController: MonoBehaviour
         UnSubcribeToButtonEvents();
 
         confirmGameButton.onClick.AddListener(ConfirmButton_onClick);
+        startButton.onClick.AddListener(StartButton_onClick);
         hostGameButton.onClick.AddListener(HostGameButton_onClick);
         quickJoinGameButton.onClick.AddListener(QuickJoinButton_onClick);
         joinGameButton.onClick.AddListener(JoinGameButton_onClick);
@@ -78,6 +82,7 @@ public class MenuUIController: MonoBehaviour
     private void UnSubcribeToButtonEvents()
     {
         confirmGameButton.onClick.RemoveListener(ConfirmButton_onClick);
+        startButton.onClick.RemoveListener(StartButton_onClick);
         hostGameButton.onClick.RemoveListener(HostGameButton_onClick);
         quickJoinGameButton.onClick.RemoveListener(QuickJoinButton_onClick);
         joinGameButton.onClick.RemoveListener(JoinGameButton_onClick);
@@ -87,6 +92,11 @@ public class MenuUIController: MonoBehaviour
     private void ConfirmButton_onClick()
     {
         EnteredPlayerName();
+    }
+
+    private void StartButton_onClick()
+    {
+        LobbyManager.Instance.StartLocalGame();
     }
 
     private void HostGameButton_onClick()

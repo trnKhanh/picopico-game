@@ -61,6 +61,9 @@ public class PlayerController : NetworkBehaviour, IDamgable
             SetColourServerRpc(PlayerStateManager.Instance.playerColour);
             SubcribePlayerMovementEvent();
             SubcribePlayerStateEvent();
+        } else
+        {
+            floatingText.gameObject.SetActive(false);
         }
 
         if (IsServer)
@@ -212,7 +215,6 @@ public class PlayerController : NetworkBehaviour, IDamgable
 
     private void PlayerStateManager_onUpdatedPlayerState(object sender, EventArgs e)
     {
-        Debug.Log("PlayerStateManager_onUpdatedPlayerState");
         SetColourServerRpc(PlayerStateManager.Instance.playerColour);
     }
 
@@ -365,11 +367,9 @@ public class PlayerController : NetworkBehaviour, IDamgable
     {
         if (IsOwner)
         {
-            Debug.Log("PlayerController:OnCollisionEnter2D");
             IInteractable interactable;
             if (collider.gameObject.TryGetComponent<IInteractable>(out interactable))
             {
-                Debug.Log("PlayerController:IInteractable");
                 m_interactables.Add(interactable);
             }
         }

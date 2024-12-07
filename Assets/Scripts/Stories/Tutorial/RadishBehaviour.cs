@@ -17,31 +17,23 @@ public class RadishBehaviour : MonoBehaviour, IInteractable
             {
                 new DialogManager.Dialog
                 {
-                    name = npcName,
-                    text = "Hello, I am Radish Boy. Welcome to the forest",
-                    audioClip = null,
-                    avatar = avatar,
+                    text = "Hello, I am Radish Boy. Welcome to the forest.",
+                    npc = DialogManager.NPC.RadishBoy
                 },
                 new DialogManager.Dialog
                 {
-                    name = npcName,
                     text = "The forest is attacked by the snails army. They are killing all the plants!!!",
-                    audioClip = null,
-                    avatar = avatar,
+                    npc = DialogManager.NPC.RadishBoy
                 },
                 new DialogManager.Dialog
                 {
-                    name = npcName,
                     text = "We cannot deal with such strong foes. Please help us.",
-                    audioClip = null,
-                    avatar = avatar,
+                    npc = DialogManager.NPC.RadishBoy
                 },
                 new DialogManager.Dialog
                 {
-                    name = npcName,
-                    text = "However, you cannot eradicate them by yourself. You must get to the Forest King and wake him from the Forever Sleep",
-                    audioClip = null,
-                    avatar = avatar,
+                    text = "However, you cannot eradicate them by yourself. You must get to the Forest King and wake him from the Forever Sleep.",
+                    npc = DialogManager.NPC.RadishBoy
                 }
             });
             interacted = true;
@@ -51,10 +43,8 @@ public class RadishBehaviour : MonoBehaviour, IInteractable
             {
                 new DialogManager.Dialog
                 {
-                    name = npcName,
                     text = "What are you waiting for. Let's go.",
-                    audioClip = null,
-                    avatar = avatar,
+                    npc = DialogManager.NPC.RadishBoy
                 }
             });
         }

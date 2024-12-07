@@ -12,6 +12,8 @@ public class AudioManager : MonoBehaviour
         Menu,
         NormalLevel,
         BossLevel,
+        SadLevel,
+        Credit
     }
     public enum SFXState
     {
@@ -42,6 +44,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource backgroundAudioSource;
     [SerializeField] private AudioSource sfxAudioSource;
 
+    [SerializeField] private BackgroundState defaultBackgroundMusic = BackgroundState.Menu;
+
     private void Awake()
     {
         if (Instance != null)
@@ -54,7 +58,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        PlayBackgroundMusic(BackgroundState.Menu);
+        PlayBackgroundMusic(defaultBackgroundMusic);
     }
 
     public void PlayBackgroundMusic(BackgroundState state) 

@@ -58,9 +58,12 @@ public class CreateRoomUI : MonoBehaviour
 
     private async void CreateRoomButton_onClick()
     {
-        await LobbyManager.Instance.CreateLobby(roomName.text, 4, isPrivate.isOn);
-        lobbyUI.Show();
-        Hide();
+        if (roomName.text == null || roomName.text.Length == 0)
+            return;
+
+        await LobbyManager.Instance.CreateLobby(roomName.text, 2, isPrivate.isOn);
+        //lobbyUI.Show();
+        //Hide();
     }
 
     private void CancleRoomButton_onClick()

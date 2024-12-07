@@ -48,14 +48,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundAudioClips:
   - state: 0
-    audioClip: {fileID: 8300000, guid: dd15eca6827df454abe37c23cdf5dc7c, type: 3}
+    audioClip: {fileID: 8300000, guid: d3cddd36dd0a44ea5bab7df8f733eb96, type: 3}
+  - state: 1
+    audioClip: {fileID: 8300000, guid: 0dd6d22a646704ebf8c96dcfc9d295d2, type: 3}
+  - state: 2
+    audioClip: {fileID: 8300000, guid: 75c26541f21ca4d14b6a3fec1c8ef76e, type: 3}
+  - state: 3
+    audioClip: {fileID: 8300000, guid: 899a1d397fec94ca8841f849417db15c, type: 3}
+  - state: 4
+    audioClip: {fileID: 8300000, guid: 899a1d397fec94ca8841f849417db15c, type: 3}
   sfxAudioClips:
   - state: 2
     audioClip: {fileID: 8300000, guid: cea96f79fad5d449db09c6456d01a6c6, type: 3}
   - state: 3
     audioClip: {fileID: 8300000, guid: df76e842439cd4ad0a95bff7c9b87fe6, type: 3}
+  - state: 0
+    audioClip: {fileID: 8300000, guid: 3b6004ca5dc0d47f2bbd556e1a287e2b, type: 3}
   backgroundAudioSource: {fileID: 6325497412011764258}
   sfxAudioSource: {fileID: 8433430407410669570}
+  defaultBackgroundMusic: 0
 --- !u!1 &5243593906227488155
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,7 +111,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -228,7 +239,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 1

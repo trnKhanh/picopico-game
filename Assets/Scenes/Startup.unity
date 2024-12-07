@@ -188,7 +188,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: multiplayerDefaultScene
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4382959122841781861, guid: 0504448ac5b964386a8088b19951b73e, type: 3}
       propertyPath: scenes.Array.data[0].sceneName
@@ -848,6 +848,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CommandManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4599755775228793203, guid: c9a62c1f874af451990490ff0293cc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8662135594863407392, guid: c9a62c1f874af451990490ff0293cc55, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.4069997
@@ -1107,10 +1111,6 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 3440563518
       objectReference: {fileID: 0}
-    - target: {fileID: 6131351713134914814, guid: f69dc1a708acd40f48da6f5e61f41d9e, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 2615544289
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1124,6 +1124,114 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3718519066519616538, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: m_fontSize
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 3718519066519616538, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4136096942946430642, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[1].npc
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[2].npc
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[3].npc
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[4].npc
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[5].npc
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[0].name
+      value: Radish Boy
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[1].name
+      value: Mr Rock
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[2].name
+      value: Warrior Plant
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[3].name
+      value: Mushrooms
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[4].name
+      value: Forest King
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[5].name
+      value: Blue Bird
+      objectReference: {fileID: 0}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[0].avatar
+      value: 
+      objectReference: {fileID: 1417912044, guid: 77ba7a48dc53f4e2895a7e2074b6fe2d, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[1].avatar
+      value: 
+      objectReference: {fileID: 965002350, guid: 8f0bc67731c7b4372b04fc029b4bf360, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[2].avatar
+      value: 
+      objectReference: {fileID: -1533332724, guid: 2369a823d96bb4163a47fec7a7ddb2c8, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[3].avatar
+      value: 
+      objectReference: {fileID: -1875251767, guid: aea73c1337f32464eaea8f543ea0da11, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[4].avatar
+      value: 
+      objectReference: {fileID: -1917015794, guid: 6c6d4b9c7f8f04251b4881984eb5e0f1, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[5].avatar
+      value: 
+      objectReference: {fileID: 434043358, guid: 437d6fcbbcc2941f9a381a3b42aa03ca, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[0].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: f1d4ed00e041e42ff92d66ebaeed9654, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[1].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: f1d4ed00e041e42ff92d66ebaeed9654, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[2].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: f1d4ed00e041e42ff92d66ebaeed9654, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[3].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: f1d4ed00e041e42ff92d66ebaeed9654, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[4].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: ed3ccab9ffe2f446abf119aee2a3c3bb, type: 3}
+    - target: {fileID: 6228961321720402249, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      propertyPath: npcData.Array.data[5].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: f1d4ed00e041e42ff92d66ebaeed9654, type: 3}
     - target: {fileID: 6898144273672106228, guid: 11ed3ba99df674666995814c233c7511, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1211,8 +1319,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6972833096458390594, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 6394824483625085259}
   m_SourcePrefab: {fileID: 100100000, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+--- !u!1 &6394824483625085258 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6972833096458390594, guid: 11ed3ba99df674666995814c233c7511, type: 3}
+  m_PrefabInstance: {fileID: 6394824483625085257}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6394824483625085259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6394824483625085258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1575815561
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1001 &7410381036648147003
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1304,6 +1441,18 @@ PrefabInstance:
     - target: {fileID: 661882615225846612, guid: 082f6cd77a8884982b2b852c9e979c3b, type: 3}
       propertyPath: m_Name
       value: LoadingScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 1750728353102575021, guid: 082f6cd77a8884982b2b852c9e979c3b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 5.050049
+      objectReference: {fileID: 0}
+    - target: {fileID: 7231906744634827274, guid: 082f6cd77a8884982b2b852c9e979c3b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 197.84998
+      objectReference: {fileID: 0}
+    - target: {fileID: 7231906744634827274, guid: 082f6cd77a8884982b2b852c9e979c3b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 4.239563
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

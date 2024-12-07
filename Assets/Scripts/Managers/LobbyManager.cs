@@ -102,6 +102,7 @@ public class LobbyManager : MonoBehaviour
     {
         yield return new WaitUntil(() => NetworkManager.Singleton != null);
         UnSubribeToNetworkManagerEvents();
+        Debug.Log("SubribeToNetworkManagerEvents");
         NetworkManager.Singleton.OnClientStopped += NetworkManager_OnClientStopped;
     }
 
@@ -113,6 +114,7 @@ public class LobbyManager : MonoBehaviour
 
     private async void NetworkManager_OnClientStopped(bool isHost)
     {
+        Debug.Log("NetworkManager_OnClientStopped");
         await LeaveLobby();
     }
 
@@ -482,12 +484,16 @@ public class LobbyManager : MonoBehaviour
     // Leave lobby
     public async Task LeaveLobby()
     {
-        NetworkManager.Singleton.Shutdown();
-        if (m_joinedLobby != null)
+        string lobbyId = m_joinedLobby?.Id;
+        m_joinedLobby = null;
+
+        if (NetworkManager.Singleton.IsConnectedClient)
+            NetworkManager.Singleton.Shutdown();
+
+        if (lobbyId != null)
         {
             try
             {
-                string lobbyId = m_joinedLobby.Id;
                 if (IsPlayerHost(m_joinedLobby, AuthenticationService.Instance.PlayerId))
                 {
                     await LobbyService.Instance.DeleteLobbyAsync(lobbyId);
@@ -496,8 +502,6 @@ public class LobbyManager : MonoBehaviour
                 {
                     await LobbyService.Instance.RemovePlayerAsync(lobbyId, AuthenticationService.Instance.PlayerId);
                 }
-
-                m_joinedLobby = null;
             }
             catch (LobbyServiceException e)
             {
@@ -565,6 +569,12 @@ public class LobbyManager : MonoBehaviour
                 Debug.Log(e);
             }
         }
+    }
+
+    public void StartLocalGame()
+    {
+        LoadingScreenUI.Instance.Show();
+        NetworkManager.Singleton.StartHost();
     }
 
     private async Task JoinGame(Lobby lobby)

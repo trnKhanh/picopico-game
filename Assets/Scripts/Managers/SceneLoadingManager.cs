@@ -61,6 +61,7 @@ public class SceneLoadingManager : NetworkBehaviour
     {
         yield return new WaitUntil(() => NetworkManager.Singleton != null);
         UnSubribeToNetworkManagerEvents();
+        Debug.Log("SubribeToNetworkManagerEvents");
         NetworkManager.Singleton.OnClientStopped += NetworkManager_OnClientStopped;
     }
 
@@ -72,6 +73,7 @@ public class SceneLoadingManager : NetworkBehaviour
 
     private void NetworkManager_OnClientStopped(bool isHost)
     {
+        Debug.Log("NetworkManager_OnClientStopped");
         LoadLocalDefaultScene();
     }
 
@@ -151,17 +153,23 @@ public class SceneLoadingManager : NetworkBehaviour
 
     private void LoadScene(string sceneName, bool useNetwork = true)
     {
+        Debug.Log($"LoadScene:sceneName={sceneName}:useNetwork={useNetwork}:clientId={NetworkManager.Singleton.LocalClientId}");
+
         if (sceneName != null)
         {
-            LoadingScreenUI.Instance.Show();
             m_curSceneName = sceneName;
 
             if (!useNetwork)
             {
+                LoadingScreenUI.Instance.Show();
                 SceneManager.LoadSceneAsync(m_curSceneName, LoadSceneMode.Single);
             }
             else
             {
+                if (IsServer)
+                {
+                    ShowLoadigScreenClientRpc();
+                }
                 try
                 {
                     if (!IsServer)
@@ -177,6 +185,11 @@ public class SceneLoadingManager : NetworkBehaviour
                 }
             }
         }
+    }
+    [ClientRpc]
+    void ShowLoadigScreenClientRpc()
+    {
+        LoadingScreenUI.Instance.Show();
     }
 
     private string GetSceneName(SceneType sceneType)

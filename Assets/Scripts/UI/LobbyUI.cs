@@ -14,6 +14,7 @@ public class LobbyUI : MonoBehaviour
 
     [SerializeField] private TMP_Text roomName;
     [SerializeField] private TMP_Text joinCode;
+    [SerializeField] private TMP_Text playerNums;
     [SerializeField] private Transform playersList;
 
     private void OnEnable()
@@ -53,6 +54,18 @@ public class LobbyUI : MonoBehaviour
 
         roomName.text = lobby.Name;
         joinCode.text = lobby.LobbyCode;
+        List<Player> players = lobby.Players;
+        int playerCount = (players != null ? players.Count : 0);
+        playerNums.text = $"Players ({playerCount}/{lobby.MaxPlayers})";
+        if (playerCount >= 2 && LobbyManager.Instance.IsHost())
+        {
+            startGameButton.gameObject.SetActive(true);
+            SubribeToButtonEvents();
+        } else
+        {
+            startGameButton.gameObject.SetActive(false);
+            UnSubribeToButtonEvents();
+        }
 
         DestroyAllChildren(playersList);
 
@@ -98,6 +111,9 @@ public class LobbyUI : MonoBehaviour
 
     private async void StartGameButton_onClick()
     {
+        List <Player> players = LobbyManager.Instance.GetJoinedLobby().Players;
+        if (players == null || players.Count < 2)
+            return;
         await LobbyManager.Instance.StartGame();
     }
 

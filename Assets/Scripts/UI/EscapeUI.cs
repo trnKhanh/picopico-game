@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +26,7 @@ public class EscapeUI : MonoBehaviour
         UnSubcribeToButtonEvents();
         continueButton.onClick.AddListener(ContinueButton_onClick);
 
-        if (LobbyManager.Instance.IsHost())
+        if (NetworkManager.Singleton.IsHost)
         {
             restartButton.gameObject.SetActive(true);
             restartButton.onClick.AddListener(RestartButton_onClick);
@@ -52,7 +53,7 @@ public class EscapeUI : MonoBehaviour
 
     private void RestartButton_onClick()
     {
-        SceneLoadingManager.Instance.ReloadScene(true);
+        SceneStateManager.Instance.Restart();
     }
 
     private async void QuitButton_onClick()

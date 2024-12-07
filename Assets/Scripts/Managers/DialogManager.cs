@@ -2,21 +2,47 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DialogManager : MonoBehaviour
+public class DialogManager : NetworkBehaviour
 {
-    public class Dialog
+    public enum NPC {
+        RadishBoy,
+        MrRock,
+        WarriorPlant,
+        Mushrooms,
+        King,
+        End,
+    };
+
+    [Serializable]
+    public class NPCData
     {
+        public NPC npc;
         public string name = null;
         public Sprite avatar = null;
-        public string text;
         public AudioClip audioClip = null;
+    }
+
+
+    [Serializable]
+    public struct Dialog: INetworkSerializable
+    {
+        public NPC npc;
+        public string text;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref npc);
+            serializer.SerializeValue(ref text);
+        }
     }
 
     static public DialogManager Instance { get; private set; }
 
+    [SerializeField] private NPCData[] npcData;
     [SerializeField] private float textDelay = 0.1f;
     [SerializeField] private Image avatarImage;
     [SerializeField] private TMP_Text dialogText;
@@ -27,7 +53,7 @@ public class DialogManager : MonoBehaviour
 
     private AudioSource m_audioSource;
     private Coroutine m_animateTextCoroutine = null;
-    private List<Dialog> m_dialogs = null;
+    private Dialog[] m_dialogs = null;
     private int m_curDialogId;
     private float m_closeTimeout = -1;
 
@@ -44,6 +70,34 @@ public class DialogManager : MonoBehaviour
         m_audioSource = GetComponent<AudioSource>();
     }
 
+    private void OnEnable()
+    {
+        StartCoroutine(SubribeToNetworkManagerEvents());
+    }
+
+    private void OnDisable()
+    {
+        UnSubribeToNetworkManagerEvents();
+    }
+
+    private IEnumerator SubribeToNetworkManagerEvents()
+    {
+        yield return new WaitUntil(() => NetworkManager.Singleton != null);
+        UnSubribeToNetworkManagerEvents();
+        NetworkManager.Singleton.OnClientStopped += NetworkManager_OnClientStopped;
+    }
+
+    private void UnSubribeToNetworkManagerEvents()
+    {
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientStopped -= NetworkManager_OnClientStopped;
+    }
+
+    private void NetworkManager_OnClientStopped(bool isHost)
+    {
+        HideDialog();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
@@ -54,6 +108,12 @@ public class DialogManager : MonoBehaviour
 
     public void PlayDialogs(List<Dialog> dialogs, float timeout = -1)
     {
+        SetDialogsServerRpc(dialogs.ToArray(), timeout);
+        PlayNextDialog();
+    }
+
+    private void SetDialogsImpl(Dialog[] dialogs, float timeout = -1)
+    {
         if (InputManager.Instance != null)
         {
             InputManager.Instance.active = false;
@@ -61,7 +121,20 @@ public class DialogManager : MonoBehaviour
         m_curDialogId = 0;
         m_dialogs = dialogs;
         m_closeTimeout = timeout;
-        PlayNextDialog();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetDialogsServerRpc(Dialog[] dialogs, float timeout = -1)
+    {
+        Debug.Log("SetDialogsServerRpc");
+        SetDialogsClientRpc(dialogs, timeout);
+    }
+
+    [ClientRpc]
+    public void SetDialogsClientRpc(Dialog[] dialogs, float timeout = -1)
+    {
+        Debug.Log("SetDialogsClientRpc");
+        SetDialogsImpl(dialogs, timeout);
     }
 
     private IEnumerator AnimateDialog(Dialog dialog)
@@ -90,10 +163,13 @@ public class DialogManager : MonoBehaviour
 
     private void PlayNextDialog()
     {
-        if (m_dialogs != null && m_curDialogId < m_dialogs.Count)
+        PlayNextDialogServerRpc();
+    }
+
+    private void PlayNextDialogImpl()
+    {
+        if (m_dialogs != null && m_curDialogId < m_dialogs.Length)
         {
-            Debug.Log(m_dialogs);
-            Debug.Log(m_curDialogId);
             m_animateTextCoroutine = StartCoroutine(AnimateDialog(m_dialogs[m_curDialogId++]));
         } else
         {
@@ -101,29 +177,43 @@ public class DialogManager : MonoBehaviour
             {
                 InputManager.Instance.active = true;
             }
-
-            onFinished?.Invoke(this, EventArgs.Empty);
+            if (m_dialogs != null)
+                onFinished?.Invoke(this, EventArgs.Empty);
+            m_dialogs = null;
+            m_curDialogId = 0;
             HideDialog();
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayNextDialogServerRpc()
+    {
+        PlayNextDialogClientRpc();
+    }
+
+    [ClientRpc]
+    private void PlayNextDialogClientRpc()
+    {
+        PlayNextDialogImpl();
     }
 
     private void StartDialog(Dialog dialog)
     {
         ShowDialog();
-
-        if (dialog.avatar != null)
+        NPCData data = GetNPCData(dialog.npc);
+        if (data.avatar != null)
         {
             avatarImage.gameObject.SetActive(true);
-            avatarImage.sprite = dialog.avatar;
+            avatarImage.sprite = data.avatar;
         }
         else
         {
             avatarImage.gameObject.SetActive(false);
         }
-        nameText.text = dialog.name;
+        nameText.text = data.name;
         dialogText.text = dialog.text;
 
-        m_audioSource.clip = dialog.audioClip;
+        m_audioSource.clip = data.audioClip;
         m_audioSource.Play();
     }
 
@@ -164,5 +254,17 @@ public class DialogManager : MonoBehaviour
     private void HideDialog()
     {
         dialogPanel.gameObject.SetActive(false);
+    }
+
+    private NPCData GetNPCData(NPC npc)
+    {
+        foreach (NPCData data in npcData)
+        {
+            if (npc == data.npc)
+            {
+                return data;
+            }
+        }
+        return null;
     }
 }

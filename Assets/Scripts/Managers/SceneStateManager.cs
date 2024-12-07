@@ -12,6 +12,7 @@ public class SceneStateManager : NetworkBehaviour
     [SerializeField] private SceneType nextScene;
 
     private List<PlayerController> players = new List<PlayerController>();
+    private bool m_ended = false;
 
     private void Awake()
     {
@@ -65,12 +66,15 @@ public class SceneStateManager : NetworkBehaviour
 
     private void PlayerController_onDied(object sender, EventArgs e)
     {
+        if (m_ended)
+            return;
+
         PlayerController player = (PlayerController)sender;
         players.Remove(player);
 
         if (players.Count == 0)
         {
-            SceneLoadingManager.Instance.ReloadScene(true);
+            Restart();
         } else
         {
             if (player.IsOwner)
@@ -80,12 +84,37 @@ public class SceneStateManager : NetworkBehaviour
         }
     }
 
-    public void End()
+    public void Restart()
     {
+        if (m_ended)
+            return;
+
         if (IsServer)
         {
-            AudioManager.Instance.PlaySFX(AudioManager.SFXState.End);
+            m_ended = true;
+            SceneLoadingManager.Instance.ReloadScene(true);
+        }
+    }
+    public void End()
+    {
+        EndServerRpc();
+    }
+
+    private void EndImpl()
+    {
+        if (m_ended)
+            return;
+
+        if (IsServer)
+        {
+            m_ended = true;
             SceneLoadingManager.Instance.LoadScene(nextScene, true, true);
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void EndServerRpc()
+    {
+        EndImpl();
     }
 }

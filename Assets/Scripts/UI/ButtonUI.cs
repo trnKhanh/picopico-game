@@ -21,6 +21,7 @@ public class ButtonUI : MonoBehaviour
         m_button.onClick.AddListener(() =>
         {
             m_animator.SetTrigger(k_clicked);
+            AudioManager.Instance.PlaySFX(AudioManager.SFXState.Confirm);
         });
     }
 
