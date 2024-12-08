@@ -20,6 +20,6 @@ Coop, Multiplayer, Platformer, Puzzle
 2022.3.29f1 <Metal> (Metal because MacOS)
 
 ### Development Device:
-  - Clip: Apple M1 Pro
+  - Chip: Apple M1 Pro
   - Memory: 16 GB
   - OS: macOS Sonoma 14.4.1
