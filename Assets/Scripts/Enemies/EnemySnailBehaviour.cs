@@ -9,7 +9,7 @@ public class EnemySnailBehaviour : EnemyBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         float contactAngle = Vector2.Angle(collision.contacts[0].normal, Vector2.up);
-        float damageAngleRange = 100;
+        float damageAngleRange = 10;
         float minAngle = (180 - damageAngleRange) / 2;
         float maxAngle = 90 + damageAngleRange / 2;
         bool dealDamage = minAngle < contactAngle && contactAngle < maxAngle;
