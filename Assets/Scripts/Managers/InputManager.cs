@@ -7,6 +7,7 @@ public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
 
+    public bool active = true;
     public float verticalInput { get; private set; }
     public float horizontalInput { get; private set; }
 
@@ -14,6 +15,8 @@ public class InputManager : MonoBehaviour
     public float horizontalInputRaw { get; private set; }
 
     public bool jump { get; private set; }
+
+    public bool interact { get; private set; }
 
     private void Awake()
     {
@@ -27,12 +30,26 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        verticalInput = Input.GetAxis("Vertical");
-        horizontalInput = Input.GetAxis("Horizontal");
+        if (active)
+        {
+            verticalInput = Input.GetAxis("Vertical");
+            horizontalInput = Input.GetAxis("Horizontal");
 
-        verticalInputRaw = Input.GetAxisRaw("Vertical");
-        horizontalInputRaw = Input.GetAxisRaw("Horizontal");
+            verticalInputRaw = Input.GetAxisRaw("Vertical");
+            horizontalInputRaw = Input.GetAxisRaw("Horizontal");
 
-        jump = (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Space));
+            jump = (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Space));
+            interact = Input.GetKeyDown(KeyCode.E);
+        } else
+        {
+            verticalInput = 0;
+            horizontalInput = 0;
+
+            verticalInputRaw = 0;
+            horizontalInputRaw = 0;
+
+            jump = false;
+            interact = false;
+        }
     }
 }

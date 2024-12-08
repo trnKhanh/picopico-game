@@ -20,7 +20,7 @@ public class EnemyController : NetworkBehaviour
 
     private void Awake()
     {
-        m_enemyBehaviour = GetComponent<EnemySnailBehaviour>();
+        m_enemyBehaviour = GetComponent<EnemyBehaviour>();
         m_animator = GetComponent<Animator>();
     }
 
@@ -75,8 +75,8 @@ public class EnemyController : NetworkBehaviour
 
     private void UnSubribeEnemyMovement()
     {
-        m_enemyBehaviour.onMoved -= EnemySnailBehaviour_onMoved;
-        m_enemyBehaviour.onStopped -= EnemySnailBehaviour_onStopped;
+        m_enemyBehaviour.onMoved -= EnemyBehaviour_onMoved;
+        m_enemyBehaviour.onStopped -= EnemyBehaviour_onStopped;
         m_enemyBehaviour.onChangedDirection -= EnemySnailBehaviour_onChangedDirection;
     }
 
@@ -84,17 +84,17 @@ public class EnemyController : NetworkBehaviour
     {
         UnSubribeEnemyMovement();
 
-        m_enemyBehaviour.onMoved += EnemySnailBehaviour_onMoved;
-        m_enemyBehaviour.onStopped += EnemySnailBehaviour_onStopped;
+        m_enemyBehaviour.onMoved += EnemyBehaviour_onMoved;
+        m_enemyBehaviour.onStopped += EnemyBehaviour_onStopped;
         m_enemyBehaviour.onChangedDirection += EnemySnailBehaviour_onChangedDirection;
     }
 
-    private void EnemySnailBehaviour_onMoved(object sender, EventArgs e)
+    private void EnemyBehaviour_onMoved(object sender, EventArgs e)
     {
         UpdateIsMovingClientRpc(true);
     }
 
-    private void EnemySnailBehaviour_onStopped(object sender, EventArgs e)
+    private void EnemyBehaviour_onStopped(object sender, EventArgs e)
     {
         UpdateIsMovingClientRpc(false);
     }

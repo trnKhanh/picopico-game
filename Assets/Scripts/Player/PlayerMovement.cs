@@ -22,7 +22,6 @@ public class PlayerMovement: NetworkBehaviour
     public event EventHandler onChangedDirection;
 
     private Rigidbody2D m_rigidbody;
-    private Animator m_animator;
     private BoxCollider2D m_collider;
 
     private const float eps = 0.01f;
@@ -38,9 +37,8 @@ public class PlayerMovement: NetworkBehaviour
 
     private void Awake()
     {
-        m_rigidbody = GetComponent<Rigidbody2D>();
-        m_animator = GetComponent<Animator>();
-        m_collider = GetComponent<BoxCollider2D>();
+        m_rigidbody = GetComponentInChildren<Rigidbody2D>();
+        m_collider = GetComponentInChildren<BoxCollider2D>();
     }
 
     private void Update()
@@ -73,7 +71,7 @@ public class PlayerMovement: NetworkBehaviour
         }
         if (m_isGrounded && !m_jump)
         {
-            m_jump = Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W);
+            m_jump = InputManager.Instance.jump;
         }
     }
 

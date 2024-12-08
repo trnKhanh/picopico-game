@@ -22,12 +22,12 @@ public class CommandManager : MonoBehaviour
     }
     private void Start()
     {
-        LobbyManager.Instance.OnCreatedLobby += CommandManager_OnCreatedLobby;
-        LobbyManager.Instance.OnLobbiesListChange += CommandManager_OnLobbiesListChange;
-        LobbyManager.Instance.OnJoinedLobby += CommandManager_OnJoinedLobby;
-        LobbyManager.Instance.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
-        LobbyManager.Instance.OnLeftLobby += CommandManager_OnLeftLobby;
-        LobbyManager.Instance.OnKickedFromLobby += CommandManager_OnKickedFromLobby;
+        LobbyManager.OnCreatedLobby += CommandManager_OnCreatedLobby;
+        LobbyManager.OnLobbiesListChange += CommandManager_OnLobbiesListChange;
+        LobbyManager.OnJoinedLobby += CommandManager_OnJoinedLobby;
+        LobbyManager.OnUpdatedLobby += CommandManager_OnUpdatedLobby;
+        LobbyManager.OnLeftLobby += CommandManager_OnLeftLobby;
+        LobbyManager.OnKickedFromLobby += CommandManager_OnKickedFromLobby;
     }
 
     private void CommandManager_OnLeftLobby(object sender, EventArgs e)
@@ -42,6 +42,8 @@ public class CommandManager : MonoBehaviour
     private void CommandManager_OnUpdatedLobby(object sender, LobbyManager.LobbyEventArgs e)
     {
         Lobby lobby = e.lobby;
+        if (lobby == null)
+            return;
         Debug.Log($"Update lobby: {lobby.Name}; {lobby.MaxPlayers}; {lobby.IsPrivate}");
         foreach (Player player in lobby.Players)
         {

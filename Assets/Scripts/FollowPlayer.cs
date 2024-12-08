@@ -12,7 +12,7 @@ public class FollowPlayer : MonoBehaviour
     private Vector2 curOffset = Vector2.zero;
 
     private void Update()
-    {
+    { 
         Vector3 newPosition = target.position;
         newPosition.x += curOffset.x;
         newPosition.y += yOffset + curOffset.y;
